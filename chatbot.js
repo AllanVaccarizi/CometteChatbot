@@ -790,7 +790,7 @@
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
         
         // Message de bienvenue avec effet machine à écrire
-        const welcomeText = `<strong>${config.branding.welcomeText}</strong><br>Je suis là pour vous répondre à vos questions !`;
+        const welcomeText = `<strong>${config.branding.welcomeText}</strong><br>Je suis là pour répondre à vos questions !`;
         typeWriter(textContainer, welcomeText, 30);
     }
 
