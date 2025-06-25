@@ -12,11 +12,11 @@
     // Create and inject styles
     const styles = `
         .n8n-chat-widget {
-            --chat--color-primary: var(--n8n-chat-primary-color, #B19CD9#F5F1E8);
+            --chat--color-primary: var(--n8n-chat-primary-color, #B19CD9);
             --chat--color-secondary: var(--n8n-chat-secondary-color, #F5F1E8);
             --chat--color-background: var(--n8n-chat-background-color, #ffffff);
             --chat--color-font: var(--n8n-chat-font-color, #1B1919);
-            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-family: 'Montserra', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
         }
         
         .n8n-chat-widget .chat-container {
@@ -94,7 +94,7 @@
             font-size: 18px;
             font-weight: 500;
             color: #ffffff;
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Montserra', sans-serif;
         }
 
         .n8n-chat-widget .chat-interface {
@@ -120,7 +120,7 @@
             word-wrap: break-word;
             font-size: 14px;
             line-height: 1.5;
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Montserra', sans-serif;
         }
 
         .n8n-chat-widget .chat-message.user {
@@ -159,7 +159,7 @@
             background: var(--chat--color-background);
             color: var(--chat--color-font);
             resize: none;
-            font-family: 'Archivo', sans-serif;
+            font-family: 'Montserra', sans-serif;
             font-size: 14px;
             transition: border-color 0.2s;
         }
@@ -182,7 +182,7 @@
     padding: 0 20px;
     cursor: pointer;
     transition: transform 0.2s;
-    font-family: 'Archivo', sans-serif;
+    font-family: 'Montserra', sans-serif;
     font-weight: 600;
     height: 100%;
     min-height: 44px;
@@ -267,6 +267,32 @@
             animation: pulse 1s infinite 0.4s;
         }
 
+        /* Nouveau style pour le conteneur typing avec texte */
+        .n8n-chat-widget .typing-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin: 10px 0;
+            margin-top: 35px;
+            margin-left: 18px;
+            gap: 4px;
+        }
+
+        .n8n-chat-widget .typing-container .typing-indicator {
+            margin: 0;
+            margin-left: 0;
+            margin-top: 0;
+        }
+
+        .n8n-chat-widget .typing-container .response-time-info {
+            font-size: 11px;
+            color: var(--chat--color-font);
+            opacity: 0.6;
+            font-family: 'Montserra', sans-serif;
+            font-style: italic;
+            padding-left: 12px;
+        }
+
         @keyframes pulse {
             0% {
                 opacity: 0.4;
@@ -291,7 +317,7 @@
             border-radius: 50%;
             background-size: cover;
             background-position: center;
-            background-image: url('https://comettecosmetics.com/wp-content/uploads/2024/11/Rectangle-5-2-1-600x623.png');
+            background-image: url('https://comettecosmetics.com/wp-content/uploads/2024/11/Rectangle-5-2-1-768x797.png');
             border: 2px solid var(--chat--color-primary);
         }
 
@@ -362,7 +388,7 @@
             font-size: 13px;
             line-height: 1.4;
             color: var(--chat--color-font);
-            font-family: 'Archivo', sans-serif;
+            font-family: 'Montserra', sans-serif;
             transition: all 0.2s ease;
         }
 
@@ -440,7 +466,7 @@
             border-radius: 20px;
             font-size: 14px;
             font-weight: 600;
-            font-family: 'Archivo', sans-serif;
+            font-family: 'Montserra', sans-serif;
             box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
             opacity: 0;
             transform: scale(0) translateX(20px);
@@ -514,7 +540,7 @@
             font-size: 11px;
             color: var(--chat--color-font);
             opacity: 0.7;
-            font-family: 'Archivo', sans-serif;
+            font-family: 'Montserra', sans-serif;
         }
 
         .n8n-chat-widget .chat-footer a {
@@ -549,7 +575,7 @@
             secondaryColor: '#F5F1E8',
             position: 'right',
             backgroundColor: '#ffffff',
-            fontColor: '#2C2C2C'
+            fontColor: '#1B1919'
         },
         security: {
             maxMessageLength: 2000,
@@ -655,6 +681,25 @@
         return text;
     }
 
+    // Fonction pour créer l'indicateur de typing avec le message de temps de réponse
+    function createTypingIndicatorWithMessage() {
+        const typingContainer = document.createElement('div');
+        typingContainer.className = 'typing-container';
+        
+        const typingIndicator = document.createElement('div');
+        typingIndicator.className = 'typing-indicator';
+        typingIndicator.innerHTML = '<span></span><span></span><span></span>';
+        
+        const responseTimeInfo = document.createElement('div');
+        responseTimeInfo.className = 'response-time-info';
+        responseTimeInfo.textContent = 'Temps moyen de réponse ~30 secondes';
+        
+        typingContainer.appendChild(typingIndicator);
+        typingContainer.appendChild(responseTimeInfo);
+        
+        return typingContainer;
+    }
+
     const chatContainer = document.createElement('div');
     chatContainer.className = `chat-container${config.style.position === 'left' ? ' position-left' : ''}`;
     
@@ -738,7 +783,7 @@
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
         
         // Message de bienvenue avec effet machine à écrire
-        const welcomeText = `<strong>${config.branding.welcomeText}</strong><br>Je suis là pour répondre à vos questions !`;
+        const welcomeText = `<strong>${config.branding.welcomeText}</strong><br>Je suis là pour vous répondre à vos questions !`;
         typeWriter(textContainer, welcomeText, 30);
     }
 
@@ -947,11 +992,9 @@
             messagesContainer.appendChild(userMessageDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-            // 6. Afficher l'indicateur de frappe
-            const typingIndicator = document.createElement('div');
-            typingIndicator.className = 'typing-indicator';
-            typingIndicator.innerHTML = '<span></span><span></span><span></span>';
-            messagesContainer.appendChild(typingIndicator);
+            // 6. Afficher l'indicateur de frappe avec le message de temps de réponse
+            const typingContainer = createTypingIndicatorWithMessage();
+            messagesContainer.appendChild(typingContainer);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
             // 7. Envoyer la requête avec timeout
@@ -982,9 +1025,9 @@
             
             console.log("Response data:", data);
             
-            // 8. Supprimer l'indicateur de frappe
-            if (messagesContainer.contains(typingIndicator)) {
-                messagesContainer.removeChild(typingIndicator);
+            // 8. Supprimer l'indicateur de frappe avec le message
+            if (messagesContainer.contains(typingContainer)) {
+                messagesContainer.removeChild(typingContainer);
             }
             
             // 9. Créer le message du bot
@@ -1022,9 +1065,9 @@
             console.error('Erreur dans sendMessage:', error);
             
             // Supprimer l'indicateur de frappe s'il existe encore
-            const existingTypingIndicator = messagesContainer.querySelector('.typing-indicator');
-            if (existingTypingIndicator) {
-                messagesContainer.removeChild(existingTypingIndicator);
+            const existingTypingContainer = messagesContainer.querySelector('.typing-container');
+            if (existingTypingContainer) {
+                messagesContainer.removeChild(existingTypingContainer);
             }
             
             // Afficher le message d'erreur approprié
@@ -1052,7 +1095,7 @@
         }
     }
 
-    async function sendMessageBackground(message, existingTypingIndicator) {
+    async function sendMessageBackground(message, existingTypingContainer) {
         try {
             const validatedMessage = validateMessage(message);
             await initializeSession();
@@ -1095,9 +1138,9 @@
             
             console.log("Response data:", data);
             
-            // Supprimer le typing indicator existant
-            if (messagesContainer.contains(existingTypingIndicator)) {
-                messagesContainer.removeChild(existingTypingIndicator);
+            // Supprimer le typing container existant
+            if (messagesContainer.contains(existingTypingContainer)) {
+                messagesContainer.removeChild(existingTypingContainer);
             }
             
             const botMessageDiv = document.createElement('div');
@@ -1130,8 +1173,8 @@
         } catch (error) {
             console.error('Erreur réseau:', error);
             
-            if (messagesContainer.contains(existingTypingIndicator)) {
-                messagesContainer.removeChild(existingTypingIndicator);
+            if (messagesContainer.contains(existingTypingContainer)) {
+                messagesContainer.removeChild(existingTypingContainer);
             }
             
             const errorMessageDiv = document.createElement('div');
@@ -1188,15 +1231,13 @@
             messagesContainer.appendChild(userMessageDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
             
-            // 3. Afficher immédiatement l'indicateur "typing"
-            const typingIndicator = document.createElement('div');
-            typingIndicator.className = 'typing-indicator';
-            typingIndicator.innerHTML = '<span></span><span></span><span></span>';
-            messagesContainer.appendChild(typingIndicator);
+            // 3. Afficher immédiatement l'indicateur "typing" avec le message de temps de réponse
+            const typingContainer = createTypingIndicatorWithMessage();
+            messagesContainer.appendChild(typingContainer);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
             
             // 4. Envoyer la requête en arrière-plan
-            sendMessageBackground(message, typingIndicator);
+            sendMessageBackground(message, typingContainer);
         });
     });
 
