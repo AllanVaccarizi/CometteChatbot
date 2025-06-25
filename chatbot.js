@@ -1330,15 +1330,10 @@
 
     // Fonction pour gérer l'affichage du popup
     function handlePopupDisplay() {
-        // Ne pas afficher le popup si l'utilisateur a fermé le chatbot
-        if (chatHasBeenClosed) {
-            return;
-        }
-        
         if (!chatContainer.classList.contains('open')) {
             // Afficher le popup avec un petit délai après fermeture
             setTimeout(() => {
-                if (!chatContainer.classList.contains('open') && !chatHasBeenClosed) {
+                if (!chatContainer.classList.contains('open')) {
                     chatPopup.classList.add('show');
                 }
             }, 1000); // 1 seconde après fermeture
@@ -1348,9 +1343,10 @@
         }
     }
 
-    // Afficher le popup initial seulement si le chatbot n'a jamais été fermé
+    // Afficher le popup initial après un délai, même si le chatbot a été fermé avant
     setTimeout(() => {
-        if (!chatHasBeenClosed) {
+        // Si le chatbot n'est pas ouvert (soit jamais ouvert, soit fermé), afficher le popup
+        if (!chatContainer.classList.contains('open')) {
             handlePopupDisplay();
         }
     }, 2000);
