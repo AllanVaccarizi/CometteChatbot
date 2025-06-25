@@ -12,8 +12,8 @@
     // Create and inject styles
     const styles = `
         .n8n-chat-widget {
-            --chat--color-primary: var(--n8n-chat-primary-color, #B19CD9);
-            --chat--color-secondary: var(--n8n-chat-secondary-color, #6b837b);
+            --chat--color-primary: var(--n8n-chat-primary-color, #6b837b);
+            --chat--color-secondary: var(--n8n-chat-secondary-color, #B19CD9);
             --chat--color-background: var(--n8n-chat-background-color, #ffffff);
             --chat--color-font: var(--n8n-chat-font-color, #1B1919);
             font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -578,8 +578,8 @@
             welcomeText: 'Besoin d\'aide ?',
         },
         style: {
-            primaryColor: '#B19CD9',
-            secondaryColor: '#6b837b',
+            primaryColor: '#6b837b',
+            secondaryColor: '#B19CD9',
             position: 'right',
             backgroundColor: '#ffffff',
             fontColor: '#1B1919'
