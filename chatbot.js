@@ -476,6 +476,13 @@
             cursor: pointer;
         }
 
+        /* Masquer le popup sur mobile */
+        @media (max-width: 768px) {
+            .n8n-chat-widget .chat-popup {
+                display: none !important;
+            }
+        }
+
         .n8n-chat-widget .chat-popup.position-left {
             right: auto;
             left: 20px;
@@ -724,7 +731,7 @@
                 <button type="submit">Envoyer</button>
             </div> 
              <div class="chat-footer">
-            Propulsé par <a href="https://agencen8n.com" target="_blank" rel="noopener noreferrer">Growth-AI</a>
+            Propulsé par <a href="https://agence-n8n.com" target="_blank" rel="noopener noreferrer">Growth-AI</a>
             </div>
         </div>
     `;
@@ -790,7 +797,7 @@
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
         
         // Message de bienvenue avec effet machine à écrire
-        const welcomeText = `<strong>${config.branding.welcomeText}</strong><br>Je suis là pour répondre à vos questions !`;
+        const welcomeText = `<strong>${config.branding.welcomeText}</strong><br>Je suis là pour vous répondre à vos questions !`;
         typeWriter(textContainer, welcomeText, 30);
     }
 
