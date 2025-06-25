@@ -1308,9 +1308,13 @@
             // Masquer le popup lors de l'ouverture
             chatPopup.classList.remove('show');
             
+            // Ajouter le message de bienvenue si la zone de messages est vide
             setTimeout(() => {
+                if (messagesContainer.children.length === 0) {
+                    addWelcomeMessage();
+                }
                 toggleButton.classList.remove('hidden');
-            }, 100);
+            }, 300); // Délai pour que l'animation d'ouverture soit terminée
         }
     });
 
