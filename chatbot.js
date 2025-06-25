@@ -16,7 +16,7 @@
             --chat--color-secondary: var(--n8n-chat-secondary-color, #F5F1E8);
             --chat--color-background: var(--n8n-chat-background-color, #ffffff);
             --chat--color-font: var(--n8n-chat-font-color, #1B1919);
-            font-family: 'Montserra', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
         }
         
         .n8n-chat-widget .chat-container {
@@ -94,7 +94,7 @@
             font-size: 18px;
             font-weight: 500;
             color: #ffffff;
-            font-family: 'Montserra', sans-serif;
+            font-family: 'Montserrat', sans-serif;
         }
 
         .n8n-chat-widget .chat-interface {
@@ -120,7 +120,7 @@
             word-wrap: break-word;
             font-size: 14px;
             line-height: 1.5;
-            font-family: 'Montserra', sans-serif;
+            font-family: 'Montserrat', sans-serif;
         }
 
         .n8n-chat-widget .chat-message.user {
@@ -159,7 +159,7 @@
             background: var(--chat--color-background);
             color: var(--chat--color-font);
             resize: none;
-            font-family: 'Montserra', sans-serif;
+            font-family: 'Montserrat', sans-serif;
             font-size: 14px;
             transition: border-color 0.2s;
         }
@@ -182,7 +182,7 @@
     padding: 0 20px;
     cursor: pointer;
     transition: transform 0.2s;
-    font-family: 'Montserra', sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-weight: 600;
     height: 100%;
     min-height: 44px;
@@ -288,7 +288,7 @@
             font-size: 11px;
             color: var(--chat--color-font);
             opacity: 0.6;
-            font-family: 'Montserra', sans-serif;
+            font-family: 'Montserrat', sans-serif;
             font-style: italic;
             padding-left: 12px;
         }
@@ -388,7 +388,7 @@
             font-size: 13px;
             line-height: 1.4;
             color: var(--chat--color-font);
-            font-family: 'Montserra', sans-serif;
+            font-family: 'Montserrat', sans-serif;
             transition: all 0.2s ease;
         }
 
@@ -466,7 +466,7 @@
             border-radius: 20px;
             font-size: 14px;
             font-weight: 600;
-            font-family: 'Montserra', sans-serif;
+            font-family: 'Montserrat', sans-serif;
             box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
             opacity: 0;
             transform: scale(0) translateX(20px);
@@ -540,7 +540,7 @@
             font-size: 11px;
             color: var(--chat--color-font);
             opacity: 0.7;
-            font-family: 'Montserra', sans-serif;
+            font-family: 'Montserrat', sans-serif;
         }
 
         .n8n-chat-widget .chat-footer a {
@@ -603,6 +603,10 @@
 
     let currentSessionId = '';
     let sessionTimeout = null;
+
+    // Variables pour mémoriser l'état du chatbot
+    let chatHasBeenClosed = localStorage.getItem('chatbot_closed') === 'true';
+    let chatHasBeenOpened = localStorage.getItem('chatbot_opened') === 'true';
 
     // Create widget container
     const widgetContainer = document.createElement('div');
@@ -744,18 +748,21 @@
     widgetContainer.appendChild(chatPopup);
     document.body.appendChild(widgetContainer);
 
-    // Auto-open chatbot
-    setTimeout(() => {
-        chatContainer.style.display = 'flex';
-        void chatContainer.offsetWidth; // Force reflow
-        chatContainer.classList.add('open');
-        chatHasBeenOpened = true;
-        
-        // Ajouter le message de bienvenue automatique après l'ouverture
+    // Auto-open chatbot seulement si c'est la première visite ET qu'il n'a jamais été fermé
+    if (!chatHasBeenOpened && !chatHasBeenClosed) {
         setTimeout(() => {
-            addWelcomeMessage();
-        }, 800); // Délai pour que l'animation d'ouverture soit terminée
-    }, 500);
+            chatContainer.style.display = 'flex';
+            void chatContainer.offsetWidth; // Force reflow
+            chatContainer.classList.add('open');
+            chatHasBeenOpened = true;
+            localStorage.setItem('chatbot_opened', 'true');
+            
+            // Ajouter le message de bienvenue automatique après l'ouverture
+            setTimeout(() => {
+                addWelcomeMessage();
+            }, 800); // Délai pour que l'animation d'ouverture soit terminée
+        }, 500);
+    }
 
     const chatInterface = chatContainer.querySelector('.chat-interface');
     const messagesContainer = chatContainer.querySelector('.chat-messages');
@@ -1259,46 +1266,13 @@
             }
         }
     });
-    
-    toggleButton.addEventListener('click', () => {
-        if (chatContainer.classList.contains('open')) {
-            // Fermeture
-            chatContainer.classList.add('closing');
-            toggleButton.classList.add('hidden');
-            
-            setTimeout(() => {
-                chatContainer.classList.remove('open', 'closing');
-                chatContainer.style.display = 'none';
-                toggleButton.classList.remove('hidden');
-                
-                // Afficher le popup après fermeture
-                handlePopupDisplay();
-            }, 300);
-        } else {
-            // Ouverture
-            chatContainer.style.display = 'flex';
-            toggleButton.classList.add('hidden');
-            
-            // Force reflow pour que l'animation fonctionne
-            void chatContainer.offsetWidth;
-            
-            chatContainer.classList.add('open');
-            chatHasBeenOpened = true;
-            
-            // Masquer le popup lors de l'ouverture
-            chatPopup.classList.remove('show');
-            
-            setTimeout(() => {
-                toggleButton.classList.remove('hidden');
-            }, 100);
-        }
-    });
 
-    const closeButton = chatContainer.querySelector('.close-button');
-    const brandHeader = chatContainer.querySelector('.brand-header');
-    
     // Fonction pour fermer le chatbot
     function closeChatbot() {
+        // Marquer que le chatbot a été fermé par l'utilisateur
+        localStorage.setItem('chatbot_closed', 'true');
+        chatHasBeenClosed = true; // Mettre à jour la variable aussi
+        
         chatContainer.classList.add('closing');
         toggleButton.classList.add('hidden');
         
@@ -1312,6 +1286,37 @@
         }, 300);
     }
     
+    toggleButton.addEventListener('click', () => {
+        if (chatContainer.classList.contains('open')) {
+            // Fermeture
+            closeChatbot();
+        } else {
+            // Ouverture manuelle - réinitialiser le flag de fermeture
+            localStorage.removeItem('chatbot_closed');
+            chatHasBeenClosed = false; // Mettre à jour la variable aussi
+            
+            chatContainer.style.display = 'flex';
+            toggleButton.classList.add('hidden');
+            
+            // Force reflow pour que l'animation fonctionne
+            void chatContainer.offsetWidth;
+            
+            chatContainer.classList.add('open');
+            chatHasBeenOpened = true;
+            localStorage.setItem('chatbot_opened', 'true');
+            
+            // Masquer le popup lors de l'ouverture
+            chatPopup.classList.remove('show');
+            
+            setTimeout(() => {
+                toggleButton.classList.remove('hidden');
+            }, 100);
+        }
+    });
+
+    const closeButton = chatContainer.querySelector('.close-button');
+    const brandHeader = chatContainer.querySelector('.brand-header');
+    
     // Event listener pour le bouton de fermeture
     closeButton.addEventListener('click', (e) => {
         e.stopPropagation(); // Empêcher la propagation vers l'en-tête
@@ -1323,15 +1328,17 @@
         closeChatbot();
     });
 
-    // Variable pour suivre si le chat a déjà été ouvert
-    let chatHasBeenOpened = false;
-
     // Fonction pour gérer l'affichage du popup
     function handlePopupDisplay() {
+        // Ne pas afficher le popup si l'utilisateur a fermé le chatbot
+        if (chatHasBeenClosed) {
+            return;
+        }
+        
         if (!chatContainer.classList.contains('open')) {
             // Afficher le popup avec un petit délai après fermeture
             setTimeout(() => {
-                if (!chatContainer.classList.contains('open')) {
+                if (!chatContainer.classList.contains('open') && !chatHasBeenClosed) {
                     chatPopup.classList.add('show');
                 }
             }, 1000); // 1 seconde après fermeture
@@ -1341,20 +1348,16 @@
         }
     }
 
-    // Afficher le popup initial après ouverture automatique (si fermé)
+    // Afficher le popup initial seulement si le chatbot n'a jamais été fermé
     setTimeout(() => {
-        handlePopupDisplay();
-    }, 2000); // Après que l'auto-ouverture soit terminée
+        if (!chatHasBeenClosed) {
+            handlePopupDisplay();
+        }
+    }, 2000);
 
     // Masquer le popup si on clique dessus ou sur le bouton
     chatPopup.addEventListener('click', () => {
         toggleButton.click();
-    });
-
-    // Modifier le gestionnaire du bouton toggle pour gérer le popup
-    toggleButton.addEventListener('click', () => {
-        chatHasBeenOpened = true;
-        chatPopup.classList.remove('show');
     });
 
     // Cleanup on page unload
