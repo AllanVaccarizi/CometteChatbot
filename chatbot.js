@@ -59,7 +59,8 @@
             padding: 16px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            justify-content: flex-end;
+            gap: 8px;
             border-bottom: 1px solid rgba(255, 128, 0, 0.1);
             position: relative;
             background: linear-gradient(135deg, var(--chat--color-primary) 0%, var(--chat--color-secondary) 100%);
@@ -68,10 +69,6 @@
         }
 
         .n8n-chat-widget .close-button {
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
             background: none;
             border: none;
             color: #ffffff;
@@ -559,22 +556,24 @@
 
         /* Style pour le bouton de nettoyage de l'historique */
         .n8n-chat-widget .clear-history-button {
-            background: none;
-            border: none;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             color: #ffffff;
             cursor: pointer;
-            padding: 4px 8px;
+            padding: 6px 12px;
             font-size: 12px;
-            opacity: 0.8;
             font-family: 'Montserrat', sans-serif;
-            border-radius: 4px;
+            font-weight: 500;
+            border-radius: 6px;
             transition: all 0.2s;
-            margin-left: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .n8n-chat-widget .clear-history-button:hover {
-            opacity: 1;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-1px);
         }
 `;
 
@@ -914,8 +913,7 @@
     const chatInterfaceHTML = `
         <div class="chat-interface">
             <div class="brand-header">
-                <span>Chat Assistant</span>
-                <button class="clear-history-button" title="Effacer l'historique">🗑️</button>
+                <button class="clear-history-button" title="Effacer l'historique">Effacer</button>
                 <button class="close-button">×</button>
             </div>
             <div class="chat-messages"></div>
@@ -1587,8 +1585,9 @@
     });
     
     brandHeader.addEventListener('click', (e) => {
-        // Ne pas fermer si on clique sur le bouton de nettoyage
-        if (e.target === clearHistoryButton || clearHistoryButton.contains(e.target)) {
+        // Ne pas fermer si on clique sur les boutons
+        if (e.target === clearHistoryButton || clearHistoryButton.contains(e.target) ||
+            e.target === closeButton || closeButton.contains(e.target)) {
             return;
         }
         closeChatbot();
