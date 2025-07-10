@@ -63,8 +63,8 @@
             border-bottom: 1px solid rgba(255, 128, 0, 0.1);
             position: relative;
             background: linear-gradient(135deg, var(--chat--color-primary) 0%, var(--chat--color-secondary) 100%);
-            cursor: pointer; /* Ajouter le curseur pointer pour indiquer que c'est cliquable */
-            user-select: none; /* Empêcher la sélection de texte */
+            cursor: pointer;
+            user-select: none;
         }
 
         .n8n-chat-widget .close-button {
@@ -175,19 +175,19 @@
         }
 
         .n8n-chat-widget .chat-input button {
-    background: linear-gradient(135deg, var(--chat--color-primary) 0%, var(--chat--color-secondary) 100%);
-    color: #ffffff;
-    border: none;
-    border-radius: 8px;
-    padding: 0 20px;
-    cursor: pointer;
-    transition: transform 0.2s;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 600;
-    height: 100%;
-    min-height: 44px;
-    align-self: stretch;
-}
+            background: linear-gradient(135deg, var(--chat--color-primary) 0%, var(--chat--color-secondary) 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 0 20px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            height: 100%;
+            min-height: 44px;
+            align-self: stretch;
+        }
 
         .n8n-chat-widget .chat-input button:hover {
             transform: scale(1.05);
@@ -267,7 +267,6 @@
             animation: pulse 1s infinite 0.4s;
         }
 
-        /* Nouveau style pour le conteneur typing avec texte */
         .n8n-chat-widget .typing-container {
             display: flex;
             flex-direction: column;
@@ -334,31 +333,30 @@
         }
 
         .n8n-chat-widget .initial-message {
-    margin: 0; /* Supprimer les marges pour prendre toute la largeur */
-    padding: 16px 20px; /* Augmenter le padding */
-    background: #f8f9fa;
-    border-radius: 0; /* Supprimer le border-radius pour aller jusqu'aux bords */
-    border-bottom: 1px solid rgba(255, 128, 0, 0.1); /* Bordure en bas au lieu de gauche */
-}
+            margin: 0;
+            padding: 16px 20px;
+            background: #f8f9fa;
+            border-radius: 0;
+            border-bottom: 1px solid rgba(255, 128, 0, 0.1);
+        }
 
-.n8n-chat-widget .initial-message h3 {
-    margin: 0 0 6px 0; /* Augmenter un peu l'espacement sous le titre */
-    color: var(--chat--color-font);
-    font-family: 'Anton SC', sans-serif;
-    font-size: 16px; /* Augmenter la taille du titre */
-    text-align: center; /* Centrer le titre */
-}
+        .n8n-chat-widget .initial-message h3 {
+            margin: 0 0 6px 0;
+            color: var(--chat--color-font);
+            font-family: 'Anton SC', sans-serif;
+            font-size: 16px;
+            text-align: center;
+        }
 
-.n8n-chat-widget .initial-message p {
-    margin: 0;
-    color: var(--chat--color-font);
-    opacity: 0.8;
-    font-size: 13px; /* Augmenter légèrement la taille du texte */
-    line-height: 1.4; /* Améliorer l'interligne */
-    text-align: center; /* Centrer le texte */
-}
+        .n8n-chat-widget .initial-message p {
+            margin: 0;
+            color: var(--chat--color-font);
+            opacity: 0.8;
+            font-size: 13px;
+            line-height: 1.4;
+            text-align: center;
+        }
 
-        /* Styles pour les messages pré-rédigés */
         .n8n-chat-widget .predefined-messages {
             padding: 16px;
             background: var(--chat--color-background);
@@ -406,7 +404,6 @@
             transform: scale(0.98);
         }
 
-        /* Animation de sortie pour les messages pré-rédigés */
         @keyframes fadeOut {
             0% {
                 opacity: 1;
@@ -422,7 +419,6 @@
             animation: fadeOut 0.3s ease forwards;
         }
 
-        /* Animation d'apparition pour les messages du bot */
         @keyframes messageAppear {
             0% {
                 opacity: 0;
@@ -442,7 +438,6 @@
             animation: messageAppear 0.2s ease-out;
         }
 
-        /* Effet curseur clignotant pour l'effet machine à écrire */
         @keyframes blink {
             0%, 50% { opacity: 1; }
             51%, 100% { opacity: 0; }
@@ -455,7 +450,6 @@
             font-weight: bold;
         }
 
-        /* Popup "Une question ?" */
         .n8n-chat-widget .chat-popup {
             position: fixed;
             bottom: 90px;
@@ -476,7 +470,6 @@
             cursor: pointer;
         }
 
-        /* Masquer le popup sur mobile */
         @media (max-width: 768px) {
             .n8n-chat-widget .chat-popup {
                 display: none !important;
@@ -520,10 +513,12 @@
         .n8n-chat-widget .chat-popup.show {
             animation: popupBounce 2s ease-in-out infinite;
         }
+
         .n8n-chat-widget .chat-message strong {
-    font-weight: 700;
-    color: inherit;
+            font-weight: 700;
+            color: inherit;
         }
+
         .n8n-chat-widget .chat-message em {
             font-style: italic;
             color: inherit;
@@ -560,7 +555,27 @@
         .n8n-chat-widget .chat-footer a:hover {
             opacity: 0.8;
             text-decoration: underline;
-        }    
+        }
+
+        /* Style pour le bouton de nettoyage de l'historique */
+        .n8n-chat-widget .clear-history-button {
+            background: none;
+            border: none;
+            color: #ffffff;
+            cursor: pointer;
+            padding: 4px 8px;
+            font-size: 12px;
+            opacity: 0.8;
+            font-family: 'Montserrat', sans-serif;
+            border-radius: 4px;
+            transition: all 0.2s;
+            margin-left: 8px;
+        }
+
+        .n8n-chat-widget .clear-history-button:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.1);
+        }
 `;
 
     // Inject styles
@@ -586,8 +601,14 @@
         },
         security: {
             maxMessageLength: 2000,
-            requestTimeout: 60000, // 60 secondes pour les réponses lentes
+            requestTimeout: 60000,
             maxSessionDuration: 3600000
+        },
+        // Nouvelles options pour l'historique
+        history: {
+            enabled: true,
+            maxMessages: 100, // Limite du nombre de messages stockés
+            persistDuration: 7 * 24 * 60 * 60 * 1000 // 7 jours en millisecondes
         }
     };
 
@@ -605,15 +626,198 @@
             webhook: { ...defaultConfig.webhook, ...window.GrowthAIChatConfig.webhook },
             branding: { ...defaultConfig.branding, ...window.GrowthAIChatConfig.branding },
             style: { ...defaultConfig.style, ...window.GrowthAIChatConfig.style },
-            security: { ...defaultConfig.security, ...window.GrowthAIChatConfig.security }
+            security: { ...defaultConfig.security, ...window.GrowthAIChatConfig.security },
+            history: { ...defaultConfig.history, ...window.GrowthAIChatConfig.history }
         } : defaultConfig;
 
     let currentSessionId = '';
     let sessionTimeout = null;
 
+    // Clé pour le localStorage
+    const STORAGE_KEY = 'chatbot_history';
+    const SESSION_KEY = 'chatbot_session';
+
     // Variables pour mémoriser l'état du chatbot
     let chatHasBeenClosed = localStorage.getItem('chatbot_closed') === 'true';
     let chatHasBeenOpened = localStorage.getItem('chatbot_opened') === 'true';
+
+    // === GESTION DE L'HISTORIQUE ===
+    
+    // Classe pour gérer l'historique des messages
+    class ChatHistory {
+        constructor() {
+            this.storageKey = STORAGE_KEY;
+            this.sessionKey = SESSION_KEY;
+            this.maxMessages = config.history.maxMessages;
+            this.persistDuration = config.history.persistDuration;
+        }
+
+        // Sauvegarder un message dans l'historique
+        saveMessage(message) {
+            if (!config.history.enabled) return;
+
+            const history = this.getHistory();
+            const messageData = {
+                ...message,
+                timestamp: Date.now(),
+                id: this.generateMessageId()
+            };
+
+            history.messages.push(messageData);
+
+            // Limiter le nombre de messages
+            if (history.messages.length > this.maxMessages) {
+                history.messages = history.messages.slice(-this.maxMessages);
+            }
+
+            // Mettre à jour le timestamp de dernière activité
+            history.lastActivity = Date.now();
+
+            this.setHistory(history);
+        }
+
+        // Récupérer l'historique
+        getHistory() {
+            try {
+                const stored = localStorage.getItem(this.storageKey);
+                if (!stored) {
+                    return this.createEmptyHistory();
+                }
+
+                const history = JSON.parse(stored);
+                
+                // Vérifier si l'historique n'est pas expiré
+                if (this.isHistoryExpired(history)) {
+                    this.clearHistory();
+                    return this.createEmptyHistory();
+                }
+
+                return history;
+            } catch (error) {
+                console.error('Erreur lors de la lecture de l\'historique:', error);
+                return this.createEmptyHistory();
+            }
+        }
+
+        // Sauvegarder l'historique
+        setHistory(history) {
+            try {
+                localStorage.setItem(this.storageKey, JSON.stringify(history));
+            } catch (error) {
+                console.error('Erreur lors de la sauvegarde de l\'historique:', error);
+                // Si le localStorage est plein, supprimer les anciens messages
+                if (error.name === 'QuotaExceededError') {
+                    history.messages = history.messages.slice(-Math.floor(this.maxMessages / 2));
+                    try {
+                        localStorage.setItem(this.storageKey, JSON.stringify(history));
+                    } catch (retryError) {
+                        console.error('Impossible de sauvegarder l\'historique même après nettoyage:', retryError);
+                    }
+                }
+            }
+        }
+
+        // Créer un historique vide
+        createEmptyHistory() {
+            return {
+                messages: [],
+                sessionId: this.getOrCreateSessionId(),
+                lastActivity: Date.now(),
+                version: '1.0'
+            };
+        }
+
+        // Vérifier si l'historique est expiré
+        isHistoryExpired(history) {
+            if (!history.lastActivity) return true;
+            return (Date.now() - history.lastActivity) > this.persistDuration;
+        }
+
+        // Nettoyer l'historique
+        clearHistory() {
+            localStorage.removeItem(this.storageKey);
+            localStorage.removeItem(this.sessionKey);
+        }
+
+        // Générer un ID unique pour un message
+        generateMessageId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        // Obtenir ou créer un ID de session persistant
+        getOrCreateSessionId() {
+            let sessionId = localStorage.getItem(this.sessionKey);
+            if (!sessionId) {
+                sessionId = this.generateUUID();
+                localStorage.setItem(this.sessionKey, sessionId);
+            }
+            return sessionId;
+        }
+
+        // Générer un UUID
+        generateUUID() {
+            if (crypto && crypto.randomUUID) {
+                return crypto.randomUUID();
+            }
+            // Fallback pour les navigateurs plus anciens
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        // Restaurer les messages dans l'interface
+        restoreMessages(messagesContainer) {
+            if (!config.history.enabled) return false;
+
+            const history = this.getHistory();
+            if (!history.messages || history.messages.length === 0) {
+                return false;
+            }
+
+            // Nettoyer le conteneur de messages
+            messagesContainer.innerHTML = '';
+
+            // Restaurer chaque message
+            history.messages.forEach(messageData => {
+                this.createMessageElement(messageData, messagesContainer);
+            });
+
+            // Faire défiler vers le bas
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            return true;
+        }
+
+        // Créer un élément de message à partir des données
+        createMessageElement(messageData, messagesContainer) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${messageData.type}`;
+
+            if (messageData.type === 'bot') {
+                // Ajouter l'avatar pour les messages du bot
+                const avatarDiv = document.createElement('div');
+                avatarDiv.className = 'bot-avatar';
+                messageDiv.appendChild(avatarDiv);
+            }
+
+            const textContainer = document.createElement('span');
+            
+            // Traiter le contenu selon le type
+            if (messageData.isHtml) {
+                textContainer.innerHTML = messageData.content;
+            } else {
+                textContainer.textContent = messageData.content;
+            }
+
+            messageDiv.appendChild(textContainer);
+            messagesContainer.appendChild(messageDiv);
+        }
+    }
+
+    // Initialiser le gestionnaire d'historique
+    const chatHistory = new ChatHistory();
 
     // Create widget container
     const widgetContainer = document.createElement('div');
@@ -645,8 +849,8 @@
     class RateLimiter {
         constructor() {
             this.requests = [];
-            this.maxRequests = 5; // 5 messages par minute
-            this.timeWindow = 60000; // 1 minute
+            this.maxRequests = 5;
+            this.timeWindow = 60000;
         }
         
         canMakeRequest() {
@@ -665,15 +869,11 @@
     const rateLimiter = new RateLimiter();
 
     function convertMarkdownToHtml(text) {
-        // Échapper d'abord tout le HTML
         text = sanitizeHtml(text);
-        
         text = text.replace(/\\n/g, '\n');
         
-        // Traiter les liens AVANT le formatage bold pour éviter les conflits
         text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, linkText, url) => {
             if (isValidUrl(url)) {
-                // Nettoyer le texte du lien des balises HTML échappées
                 let cleanLinkText = linkText
                     .replace(/&lt;strong&gt;/g, '<strong>')
                     .replace(/&lt;\/strong&gt;/g, '</strong>')
@@ -685,14 +885,11 @@
             return linkText;
         });
         
-        // Traiter le formatage bold APRÈS les liens
         text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-        
         text = text.replace(/\n/g, '<br>');
         return text;
     }
 
-    // Fonction pour créer l'indicateur de typing avec le message de temps de réponse
     function createTypingIndicatorWithMessage() {
         const typingContainer = document.createElement('div');
         typingContainer.className = 'typing-container';
@@ -717,6 +914,8 @@
     const chatInterfaceHTML = `
         <div class="chat-interface">
             <div class="brand-header">
+                <span>Chat Assistant</span>
+                <button class="clear-history-button" title="Effacer l'historique">🗑️</button>
                 <button class="close-button">×</button>
             </div>
             <div class="chat-messages"></div>
@@ -745,7 +944,6 @@
             <path d="M12 2C6.477 2 2 6.477 2 12c0 1.821.487 3.53 1.338 5L2.5 21.5l4.5-.838A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18c-1.476 0-2.886-.313-4.156-.878l-3.156.586.586-3.156A7.962 7.962 0 014 12c0-4.411 3.589-8 8-8s8 3.589 8 8-3.589 8-8 8z"/>
         </svg>`;
     
-    // Créer le popup "Une question ?"
     const chatPopup = document.createElement('div');
     chatPopup.className = `chat-popup${config.style.position === 'left' ? ' position-left' : ''}`;
     chatPopup.textContent = 'Une question ?';
@@ -755,33 +953,57 @@
     widgetContainer.appendChild(chatPopup);
     document.body.appendChild(widgetContainer);
 
-    // Auto-open chatbot seulement si c'est la première visite ET qu'il n'a jamais été fermé
-    if (!chatHasBeenOpened && !chatHasBeenClosed) {
-        setTimeout(() => {
-            chatContainer.style.display = 'flex';
-            void chatContainer.offsetWidth; // Force reflow
-            chatContainer.classList.add('open');
-            chatHasBeenOpened = true;
-            localStorage.setItem('chatbot_opened', 'true');
-            
-            // Ajouter le message de bienvenue automatique après l'ouverture
-            setTimeout(() => {
-                addWelcomeMessage();
-            }, 800); // Délai pour que l'animation d'ouverture soit terminée
-        }, 500);
-    }
-
     const chatInterface = chatContainer.querySelector('.chat-interface');
     const messagesContainer = chatContainer.querySelector('.chat-messages');
     const textarea = chatContainer.querySelector('textarea');
     const sendButton = chatContainer.querySelector('button[type="submit"]');
     const predefinedMessagesContainer = chatContainer.querySelector('.predefined-messages');
+    const clearHistoryButton = chatContainer.querySelector('.clear-history-button');
 
-    function generateUUID() {
-        return crypto.randomUUID();
+    // Récupérer l'ID de session persistant
+    currentSessionId = chatHistory.getOrCreateSessionId();
+
+    // Gestionnaire pour effacer l'historique
+    clearHistoryButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (confirm('Êtes-vous sûr de vouloir effacer tout l\'historique des messages ?')) {
+            chatHistory.clearHistory();
+            messagesContainer.innerHTML = '';
+            // Réinitialiser l'ID de session
+            currentSessionId = chatHistory.getOrCreateSessionId();
+            // Masquer les messages pré-rédigés et ajouter le message de bienvenue
+            hidePredefinedMessages();
+            setTimeout(() => addWelcomeMessage(), 300);
+        }
+    });
+
+    // Auto-open chatbot seulement si c'est la première visite ET qu'il n'a jamais été fermé
+    if (!chatHasBeenOpened && !chatHasBeenClosed) {
+        setTimeout(() => {
+            chatContainer.style.display = 'flex';
+            void chatContainer.offsetWidth;
+            chatContainer.classList.add('open');
+            chatHasBeenOpened = true;
+            localStorage.setItem('chatbot_opened', 'true');
+            
+            setTimeout(() => {
+                // Essayer de restaurer l'historique d'abord
+                const hasHistory = chatHistory.restoreMessages(messagesContainer);
+                if (hasHistory) {
+                    // Si il y a un historique, masquer les messages pré-rédigés
+                    hidePredefinedMessages();
+                } else {
+                    // Sinon, ajouter le message de bienvenue
+                    addWelcomeMessage();
+                }
+            }, 800);
+        }, 500);
     }
 
-    // Fonction pour ajouter le message de bienvenue automatique
+    function generateUUID() {
+        return chatHistory.generateUUID();
+    }
+
     function addWelcomeMessage() {
         const welcomeMessageDiv = document.createElement('div');
         welcomeMessageDiv.className = 'chat-message bot';
@@ -796,8 +1018,15 @@
         messagesContainer.appendChild(welcomeMessageDiv);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
         
-        // Message de bienvenue avec effet machine à écrire
         const welcomeText = `<strong>${config.branding.welcomeText}</strong><br>Je suis là pour vous répondre à vos questions !`;
+        
+        // Sauvegarder le message de bienvenue dans l'historique
+        chatHistory.saveMessage({
+            type: 'bot',
+            content: welcomeText,
+            isHtml: true
+        });
+        
         typeWriter(textContainer, welcomeText, 30);
     }
 
@@ -830,73 +1059,65 @@
         return message.trim();
     }
 
-    // Session management with timeout
     function resetSessionTimeout() {
         if (sessionTimeout) {
             clearTimeout(sessionTimeout);
         }
         sessionTimeout = setTimeout(() => {
-            currentSessionId = '';
             console.log('Session expirée');
         }, config.security.maxSessionDuration);
     }
 
-    // Initialiser la session automatiquement lors de l'ouverture
     async function initializeSession() {
         if (!currentSessionId) {
-            currentSessionId = generateUUID();
-            resetSessionTimeout();
-            
-            const data = [{
-                action: "loadPreviousSession",
-                sessionId: currentSessionId,
-                route: config.webhook.route,
-                metadata: {
-                    userId: "",
-                    timestamp: Date.now(),
-                    userAgent: navigator.userAgent.substring(0, 100)
-                }
-            }];
-
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), config.security.requestTimeout);
-
-                const response = await fetch(config.webhook.url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data),
-                    signal: controller.signal
-                });
-
-                clearTimeout(timeoutId);
-                const responseData = await response.json();
-                console.log('Session initialized:', responseData);
-            } catch (error) {
-                console.error('Error initializing session:', error);
+            currentSessionId = chatHistory.getOrCreateSessionId();
+        }
+        resetSessionTimeout();
+        
+        const data = [{
+            action: "loadPreviousSession",
+            sessionId: currentSessionId,
+            route: config.webhook.route,
+            metadata: {
+                userId: "",
+                timestamp: Date.now(),
+                userAgent: navigator.userAgent.substring(0, 100)
             }
-        } else {
-            resetSessionTimeout();
+        }];
+
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), config.security.requestTimeout);
+
+            const response = await fetch(config.webhook.url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data),
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+            const responseData = await response.json();
+            console.log('Session initialized:', responseData);
+        } catch (error) {
+            console.error('Error initializing session:', error);
         }
     }
 
-    // Fonction pour masquer les messages pré-rédigés
     function hidePredefinedMessages() {
         if (predefinedMessagesContainer && !predefinedMessagesContainer.classList.contains('hide')) {
             predefinedMessagesContainer.style.display = 'none';
         }
     }
 
-    // Fonction pour créer l'effet machine à écrire
     function typeWriter(element, htmlText, speed = 30) {
         let index = 0;
         const parentDiv = element.parentElement;
         parentDiv.classList.add('typing');
         element.innerHTML = '';
         
-        // Convertir le HTML en texte visible + balises cachées
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = htmlText;
         const textContent = tempDiv.textContent || tempDiv.innerText || '';
@@ -964,7 +1185,6 @@
     }
 
     async function sendMessage(message) {
-        // 1. Vérifier le rate limiting
         if (!rateLimiter.canMakeRequest()) {
             const errorDiv = document.createElement('div');
             errorDiv.className = 'chat-message bot';
@@ -980,13 +1200,9 @@
         }
 
         try {
-            // 2. Valider le message
             const validatedMessage = validateMessage(message);
-            
-            // 3. Initialiser la session
             await initializeSession();
 
-            // 4. Préparer les données
             const messageData = {
                 action: "sendMessage",
                 sessionId: currentSessionId,
@@ -999,19 +1215,23 @@
                 }
             };
             
-            // 5. Afficher le message utilisateur (avec le message validé)
             const userMessageDiv = document.createElement('div');
             userMessageDiv.className = 'chat-message user';
             userMessageDiv.textContent = validatedMessage;
             messagesContainer.appendChild(userMessageDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-            // 6. Afficher l'indicateur de frappe avec le message de temps de réponse
+            // Sauvegarder le message utilisateur dans l'historique
+            chatHistory.saveMessage({
+                type: 'user',
+                content: validatedMessage,
+                isHtml: false
+            });
+
             const typingContainer = createTypingIndicatorWithMessage();
             messagesContainer.appendChild(typingContainer);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-            // 7. Envoyer la requête avec timeout
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), config.security.requestTimeout);
 
@@ -1032,19 +1252,16 @@
             
             const data = await response.json();
             
-            // Valider la réponse du serveur
             if (!data || (Array.isArray(data) && !data[0]?.output) || (!Array.isArray(data) && !data.output)) {
                 throw new Error('Réponse invalide du serveur');
             }
             
             console.log("Response data:", data);
             
-            // 8. Supprimer l'indicateur de frappe avec le message
             if (messagesContainer.contains(typingContainer)) {
                 messagesContainer.removeChild(typingContainer);
             }
             
-            // 9. Créer le message du bot
             const botMessageDiv = document.createElement('div');
             botMessageDiv.className = 'chat-message bot';
             
@@ -1055,22 +1272,31 @@
             const textContainer = document.createElement('span');
             botMessageDiv.appendChild(textContainer);
             
-            // 10. Traiter la réponse
             let messageText = Array.isArray(data) ? data[0].output : data.output;
             
-            // Sanitize response
             if (typeof messageText === 'string') {
                 messagesContainer.appendChild(botMessageDiv);
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
                 
-                // 11. Appliquer l'effet machine à écrire
+                let processedText = messageText;
+                let isHtml = false;
+                
                 if (messageText.trim().startsWith('<html>') && messageText.trim().endsWith('</html>')) {
-                    messageText = messageText.replace(/<html>|<\/html>/g, '').trim();
-                    typeWriter(textContainer, messageText, 20);
+                    processedText = messageText.replace(/<html>|<\/html>/g, '').trim();
+                    isHtml = true;
                 } else {
-                    messageText = convertMarkdownToHtml(messageText);
-                    typeWriter(textContainer, messageText, 20);
+                    processedText = convertMarkdownToHtml(messageText);
+                    isHtml = true;
                 }
+
+                // Sauvegarder la réponse du bot dans l'historique
+                chatHistory.saveMessage({
+                    type: 'bot',
+                    content: processedText,
+                    isHtml: isHtml
+                });
+                
+                typeWriter(textContainer, processedText, 20);
             } else {
                 throw new Error('Réponse invalide du serveur');
             }
@@ -1078,13 +1304,11 @@
         } catch (error) {
             console.error('Erreur dans sendMessage:', error);
             
-            // Supprimer l'indicateur de frappe s'il existe encore
             const existingTypingContainer = messagesContainer.querySelector('.typing-container');
             if (existingTypingContainer) {
                 messagesContainer.removeChild(existingTypingContainer);
             }
             
-            // Afficher le message d'erreur approprié
             const errorDiv = document.createElement('div');
             errorDiv.className = 'chat-message bot';
             
@@ -1095,17 +1319,25 @@
             const textContainer = document.createElement('span');
             errorDiv.appendChild(textContainer);
             
-            // Message d'erreur spécifique selon le type d'erreur
+            let errorMessage;
             if (error.message.includes('trop long') || error.message.includes('non autorisé') || error.message.includes('invalide')) {
-                textContainer.textContent = error.message;
+                errorMessage = error.message;
             } else if (error.name === 'AbortError') {
-                textContainer.textContent = "La requête a pris trop de temps. Veuillez réessayer.";
+                errorMessage = "La requête a pris trop de temps. Veuillez réessayer.";
             } else {
-                textContainer.textContent = "Désolé, une erreur est survenue. Veuillez réessayer.";
+                errorMessage = "Désolé, une erreur est survenue. Veuillez réessayer.";
             }
-            
+
+            textContainer.textContent = errorMessage;
             messagesContainer.appendChild(errorDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // Sauvegarder le message d'erreur dans l'historique
+            chatHistory.saveMessage({
+                type: 'bot',
+                content: errorMessage,
+                isHtml: false
+            });
         }
     }
 
@@ -1126,6 +1358,13 @@
                 }
             };
 
+            // Sauvegarder le message utilisateur dans l'historique
+            chatHistory.saveMessage({
+                type: 'user',
+                content: validatedMessage,
+                isHtml: false
+            });
+
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), config.security.requestTimeout);
 
@@ -1152,7 +1391,6 @@
             
             console.log("Response data:", data);
             
-            // Supprimer le typing container existant
             if (messagesContainer.contains(existingTypingContainer)) {
                 messagesContainer.removeChild(existingTypingContainer);
             }
@@ -1173,13 +1411,25 @@
                 messagesContainer.appendChild(botMessageDiv);
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
                 
+                let processedText = messageText;
+                let isHtml = false;
+                
                 if (messageText.trim().startsWith('<html>') && messageText.trim().endsWith('</html>')) {
-                    messageText = messageText.replace(/<html>|<\/html>/g, '').trim();
-                    typeWriter(textContainer, messageText, 20);
+                    processedText = messageText.replace(/<html>|<\/html>/g, '').trim();
+                    isHtml = true;
                 } else {
-                    messageText = convertMarkdownToHtml(messageText);
-                    typeWriter(textContainer, messageText, 20);
+                    processedText = convertMarkdownToHtml(messageText);
+                    isHtml = true;
                 }
+
+                // Sauvegarder la réponse du bot dans l'historique
+                chatHistory.saveMessage({
+                    type: 'bot',
+                    content: processedText,
+                    isHtml: isHtml
+                });
+                
+                typeWriter(textContainer, processedText, 20);
             } else {
                 throw new Error('Réponse invalide du serveur');
             }
@@ -1201,26 +1451,33 @@
             const textContainer = document.createElement('span');
             errorMessageDiv.appendChild(textContainer);
             
+            let errorMessage;
             if (error.message.includes('trop long') || error.message.includes('non autorisé') || error.message.includes('invalide')) {
-                textContainer.textContent = error.message;
+                errorMessage = error.message;
             } else if (error.name === 'AbortError') {
-                textContainer.textContent = "La requête a pris trop de temps. Veuillez réessayer.";
+                errorMessage = "La requête a pris trop de temps. Veuillez réessayer.";
             } else {
-                textContainer.textContent = "Désolé, une erreur est survenue. Veuillez réessayer.";
+                errorMessage = "Désolé, une erreur est survenue. Veuillez réessayer.";
             }
-            
+
+            textContainer.textContent = errorMessage;
             messagesContainer.appendChild(errorMessageDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // Sauvegarder le message d'erreur dans l'historique
+            chatHistory.saveMessage({
+                type: 'bot',
+                content: errorMessage,
+                isHtml: false
+            });
         }
     }
 
-    // Gestionnaire pour les messages pré-rédigés
     const predefinedMessageButtons = chatContainer.querySelectorAll('.predefined-message-button');
     predefinedMessageButtons.forEach(button => {
         button.addEventListener('click', () => {
             const message = button.textContent;
             
-            // Vérifier le rate limiting pour les messages pré-rédigés aussi
             if (!rateLimiter.canMakeRequest()) {
                 const errorDiv = document.createElement('div');
                 errorDiv.className = 'chat-message bot';
@@ -1235,22 +1492,18 @@
                 return;
             }
             
-            // 1. Masquer immédiatement les messages pré-remplis
             hidePredefinedMessages();
             
-            // 2. Afficher immédiatement le message utilisateur
             const userMessageDiv = document.createElement('div');
             userMessageDiv.className = 'chat-message user';
             userMessageDiv.textContent = message;
             messagesContainer.appendChild(userMessageDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
             
-            // 3. Afficher immédiatement l'indicateur "typing" avec le message de temps de réponse
             const typingContainer = createTypingIndicatorWithMessage();
             messagesContainer.appendChild(typingContainer);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
             
-            // 4. Envoyer la requête en arrière-plan
             sendMessageBackground(message, typingContainer);
         });
     });
@@ -1274,11 +1527,9 @@
         }
     });
 
-    // Fonction pour fermer le chatbot
     function closeChatbot() {
-        // Marquer que le chatbot a été fermé par l'utilisateur
         localStorage.setItem('chatbot_closed', 'true');
-        chatHasBeenClosed = true; // Mettre à jour la variable aussi
+        chatHasBeenClosed = true;
         
         chatContainer.classList.add('closing');
         toggleButton.classList.add('hidden');
@@ -1287,89 +1538,77 @@
             chatContainer.classList.remove('open', 'closing');
             chatContainer.style.display = 'none';
             toggleButton.classList.remove('hidden');
-            
-            // Afficher le popup après fermeture
             handlePopupDisplay();
         }, 300);
     }
     
     toggleButton.addEventListener('click', () => {
         if (chatContainer.classList.contains('open')) {
-            // Fermeture
             closeChatbot();
         } else {
-            // Ouverture manuelle - réinitialiser le flag de fermeture
             localStorage.removeItem('chatbot_closed');
-            chatHasBeenClosed = false; // Mettre à jour la variable aussi
+            chatHasBeenClosed = false;
             
             chatContainer.style.display = 'flex';
             toggleButton.classList.add('hidden');
-            
-            // Force reflow pour que l'animation fonctionne
             void chatContainer.offsetWidth;
-            
             chatContainer.classList.add('open');
             chatHasBeenOpened = true;
             localStorage.setItem('chatbot_opened', 'true');
-            
-            // Masquer le popup lors de l'ouverture
             chatPopup.classList.remove('show');
             
-            // Ajouter le message de bienvenue si la zone de messages est vide
             setTimeout(() => {
-                if (messagesContainer.children.length === 0) {
+                // Essayer de restaurer l'historique
+                const hasHistory = chatHistory.restoreMessages(messagesContainer);
+                if (hasHistory) {
+                    hidePredefinedMessages();
+                } else if (messagesContainer.children.length === 0) {
                     addWelcomeMessage();
                 }
                 toggleButton.classList.remove('hidden');
-            }, 300); // Délai pour que l'animation d'ouverture soit terminée
+            }, 300);
         }
     });
 
     const closeButton = chatContainer.querySelector('.close-button');
     const brandHeader = chatContainer.querySelector('.brand-header');
     
-    // Event listener pour le bouton de fermeture
     closeButton.addEventListener('click', (e) => {
-        e.stopPropagation(); // Empêcher la propagation vers l'en-tête
+        e.stopPropagation();
         closeChatbot();
     });
     
-    // Event listener pour l'en-tête complet
-    brandHeader.addEventListener('click', () => {
+    brandHeader.addEventListener('click', (e) => {
+        // Ne pas fermer si on clique sur le bouton de nettoyage
+        if (e.target === clearHistoryButton || clearHistoryButton.contains(e.target)) {
+            return;
+        }
         closeChatbot();
     });
 
-    // Fonction pour gérer l'affichage du popup
     function handlePopupDisplay() {
         if (!chatContainer.classList.contains('open')) {
-            // Afficher le popup avec un petit délai après fermeture
             setTimeout(() => {
                 if (!chatContainer.classList.contains('open')) {
                     chatPopup.classList.add('show');
                 }
-            }, 1000); // 1 seconde après fermeture
+            }, 1000);
         } else {
-            // Masquer le popup si le chat est ouvert
             chatPopup.classList.remove('show');
         }
     }
 
-    // Afficher le popup initial après un délai, même si le chatbot a été fermé avant
     setTimeout(() => {
-        // Si le chatbot n'est pas ouvert (soit jamais ouvert, soit fermé), afficher le popup
         if (!chatContainer.classList.contains('open')) {
             handlePopupDisplay();
         }
     }, 2000);
 
-    // Masquer le popup si on clique dessus ou sur le bouton
     chatPopup.addEventListener('click', () => {
         toggleButton.click();
     });
 
-    // Cleanup on page unload
     window.addEventListener('beforeunload', () => {
-        currentSessionId = '';
         if (sessionTimeout) {
             clearTimeout(sessionTimeout);
         }
