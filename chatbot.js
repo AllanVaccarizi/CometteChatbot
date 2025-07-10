@@ -971,8 +971,9 @@
             messagesContainer.innerHTML = '';
             // Réinitialiser l'ID de session
             currentSessionId = chatHistory.getOrCreateSessionId();
-            // Masquer les messages pré-rédigés et ajouter le message de bienvenue
-            hidePredefinedMessages();
+            // Réafficher les messages pré-rédigés
+            showPredefinedMessages();
+            // Ajouter le message de bienvenue
             setTimeout(() => addWelcomeMessage(), 300);
         }
     });
@@ -1109,6 +1110,13 @@
     function hidePredefinedMessages() {
         if (predefinedMessagesContainer && !predefinedMessagesContainer.classList.contains('hide')) {
             predefinedMessagesContainer.style.display = 'none';
+        }
+    }
+
+    function showPredefinedMessages() {
+        if (predefinedMessagesContainer) {
+            predefinedMessagesContainer.style.display = 'block';
+            predefinedMessagesContainer.classList.remove('hide');
         }
     }
 
