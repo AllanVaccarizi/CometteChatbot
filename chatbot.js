@@ -59,7 +59,7 @@
             padding: 16px;
             display: flex;
             align-items: center;
-            justify-content: flex-end;
+            justify-content: space-between;
             gap: 8px;
             border-bottom: 1px solid rgba(255, 128, 0, 0.1);
             position: relative;
