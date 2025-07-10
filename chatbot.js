@@ -56,7 +56,7 @@
         }
 
         .n8n-chat-widget .brand-header {
-            padding: 16px;
+            padding: 8px 12px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -73,12 +73,12 @@
             border: none;
             color: #ffffff;
             cursor: pointer;
-            padding: 4px;
+            padding: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: color 0.2s;
-            font-size: 20px;
+            font-size: 18px;
             opacity: 0.8;
             font-weight: bold;
         }
@@ -560,11 +560,11 @@
             border: 1px solid rgba(255, 255, 255, 0.3);
             color: #ffffff;
             cursor: pointer;
-            padding: 6px 12px;
-            font-size: 12px;
+            padding: 4px 8px;
+            font-size: 11px;
             font-family: 'Montserrat', sans-serif;
             font-weight: 500;
-            border-radius: 6px;
+            border-radius: 4px;
             transition: all 0.2s;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -671,6 +671,11 @@
 
             // Mettre à jour le timestamp de dernière activité
             history.lastActivity = Date.now();
+            
+            // Marquer qu'il y a eu une vraie conversation si ce n'est pas juste le message de bienvenue
+            if (message.type === 'user' || (message.type === 'bot' && !message.isWelcome)) {
+                history.hasRealConversation = true;
+            }
 
             this.setHistory(history);
         }
@@ -722,6 +727,7 @@
                 messages: [],
                 sessionId: this.getOrCreateSessionId(),
                 lastActivity: Date.now(),
+                hasRealConversation: false, // Nouveau flag pour détecter une vraie conversation
                 version: '1.0'
             };
         }
@@ -772,6 +778,11 @@
 
             const history = this.getHistory();
             if (!history.messages || history.messages.length === 0) {
+                return false;
+            }
+
+            // Si il n'y a pas eu de vraie conversation, ne pas restaurer (juste le message de bienvenue)
+            if (!history.hasRealConversation) {
                 return false;
             }
 
@@ -1023,7 +1034,8 @@
         chatHistory.saveMessage({
             type: 'bot',
             content: welcomeText,
-            isHtml: true
+            isHtml: true,
+            isWelcome: true // Marquer comme message de bienvenue
         });
         
         typeWriter(textContainer, welcomeText, 30);
