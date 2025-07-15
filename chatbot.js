@@ -726,6 +726,91 @@
     let chatHasBeenClosed = localStorage.getItem('chatbot_closed') === 'true';
     let chatHasBeenOpened = localStorage.getItem('chatbot_opened') === 'true';
 
+    // === SYSTÈME DE HEARTBEAT === 
+    // Configuration du heartbeat
+    const HEARTBEAT_INTERVAL = 15000; // 15 secondes
+    let heartbeatTimer = null;
+    let isWidgetOpen = false;
+
+    // Configuration Supabase pour heartbeat
+    const supabaseUrl = 'https://jjduutxyeqvvpqberswf.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqZHV1dHh5ZXF2dnBxYmVyc3dmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMwNjM1NTUsImV4cCI6MjA1ODYzOTU1NX0.xAa_oHU52QKEgQDKYgtERCGcTsKgUE63f8BhAvsrw4g';
+    const tableName = 'comette_chat';
+
+    // Fonction pour envoyer un heartbeat
+    async function sendHeartbeat(status = 'online') {
+        if (!currentSessionId) return;
+        
+        try {
+            const response = await fetch(`${supabaseUrl}/rest/v1/${tableName}`, {
+                method: 'PATCH',
+                headers: {
+                    'apikey': supabaseKey,
+                    'Authorization': `Bearer ${supabaseKey}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify({
+                    user_status: status,
+                    chatbot_open: isWidgetOpen,
+                    last_heartbeat: new Date().toISOString(),
+                    last_activity: new Date().toISOString()
+                })
+            });
+            
+            if (response.ok) {
+                console.log(`Heartbeat envoyé: ${status}, widget: ${isWidgetOpen}`);
+            } else {
+                console.error('Erreur heartbeat:', await response.text());
+            }
+        } catch (error) {
+            console.error('Erreur lors de l\'envoi du heartbeat:', error);
+        }
+    }
+
+    // Fonction pour démarrer le heartbeat
+    function startHeartbeat() {
+        if (heartbeatTimer) return; // Éviter les doublons
+        
+        // Envoyer immédiatement
+        sendHeartbeat('online');
+        
+        // Puis envoyer toutes les 15 secondes
+        heartbeatTimer = setInterval(() => {
+            if (isWidgetOpen) {
+                sendHeartbeat('online');
+            }
+        }, HEARTBEAT_INTERVAL);
+        
+        console.log('Heartbeat démarré');
+    }
+
+    // Fonction pour arrêter le heartbeat
+    function stopHeartbeat() {
+        if (heartbeatTimer) {
+            clearInterval(heartbeatTimer);
+            heartbeatTimer = null;
+            console.log('Heartbeat arrêté');
+        }
+        
+        // Envoyer un dernier heartbeat "offline"
+        sendHeartbeat('offline');
+    }
+
+    // Fonction pour gérer l'ouverture du widget
+    function onWidgetOpen() {
+        isWidgetOpen = true;
+        startHeartbeat();
+        console.log('Widget ouvert - Heartbeat démarré');
+    }
+
+    // Fonction pour gérer la fermeture du widget
+    function onWidgetClose() {
+        isWidgetOpen = false;
+        stopHeartbeat();
+        console.log('Widget fermé - Heartbeat arrêté');
+    }
+
     // === GESTION DE L'HISTORIQUE ===
     
     // Classe pour gérer l'historique des messages
@@ -1081,6 +1166,8 @@
             chatContainer.classList.add('open');
             chatHasBeenOpened = true;
             localStorage.setItem('chatbot_opened', 'true');
+            
+            onWidgetOpen(); // 🔹 AJOUT DU HEARTBEAT
             
             setTimeout(() => {
                 // Essayer de restaurer l'historique d'abord
@@ -1635,6 +1722,8 @@
     });
 
     function closeChatbot() {
+        onWidgetClose(); // 🔹 AJOUT DU HEARTBEAT
+        
         localStorage.setItem('chatbot_closed', 'true');
         chatHasBeenClosed = true;
         
@@ -1663,6 +1752,8 @@
             chatHasBeenOpened = true;
             localStorage.setItem('chatbot_opened', 'true');
             chatPopup.classList.remove('show');
+            
+            onWidgetOpen(); // 🔹 AJOUT DU HEARTBEAT
             
             setTimeout(() => {
                 // Essayer de restaurer l'historique
@@ -1716,9 +1807,49 @@
         toggleButton.click();
     });
 
+    // === GESTION DES ÉVÉNEMENTS DE FERMETURE DE PAGE ===
+    
+    // Gestion des événements de fermeture de page
     window.addEventListener('beforeunload', () => {
+        // Envoyer un statut offline avant la fermeture
+        if (isWidgetOpen && currentSessionId) {
+            navigator.sendBeacon(
+                `${supabaseUrl}/rest/v1/${tableName}?session_id=eq.${currentSessionId}`,
+                JSON.stringify({
+                    user_status: 'offline',
+                    chatbot_open: false,
+                    last_activity: new Date().toISOString()
+                })
+            );
+        }
+        
         if (sessionTimeout) {
             clearTimeout(sessionTimeout);
+        }
+    });
+
+    // Gestion de la visibilité de la page
+    document.addEventListener('visibilitychange', () => {
+        if (isWidgetOpen) {
+            if (document.hidden) {
+                sendHeartbeat('away');
+            } else {
+                sendHeartbeat('online');
+            }
+        }
+    });
+
+    // Gestion de la perte de focus
+    window.addEventListener('blur', () => {
+        if (isWidgetOpen) {
+            sendHeartbeat('away');
+        }
+    });
+
+    // Gestion du retour de focus
+    window.addEventListener('focus', () => {
+        if (isWidgetOpen) {
+            sendHeartbeat('online');
         }
     });
 
