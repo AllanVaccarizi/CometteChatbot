@@ -739,34 +739,35 @@
 
     // Fonction pour envoyer un heartbeat
     async function sendHeartbeat(status = 'online') {
-        if (!currentSessionId) return;
+    if (!currentSessionId) return;
+    
+    try {
+        const response = await fetch(`${supabaseUrl}/rest/v1/${tableName}?session_id=eq.${currentSessionId}`, {
+            method: 'PATCH',
+            headers: {
+                'apikey': supabaseKey,
+                'Authorization': `Bearer ${supabaseKey}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=minimal'
+            },
+            body: JSON.stringify({
+                user_status: status,
+                chatbot_open: isWidgetOpen,
+                last_heartbeat: new Date().toISOString(),
+                last_activity: new Date().toISOString()
+            })
+        });
         
-        try {
-            const response = await fetch(`${supabaseUrl}/rest/v1/${tableName}`, {
-                method: 'PATCH',
-                headers: {
-                    'apikey': supabaseKey,
-                    'Authorization': `Bearer ${supabaseKey}`,
-                    'Content-Type': 'application/json',
-                    'Prefer': 'return=minimal'
-                },
-                body: JSON.stringify({
-                    user_status: status,
-                    chatbot_open: isWidgetOpen,
-                    last_heartbeat: new Date().toISOString(),
-                    last_activity: new Date().toISOString()
-                })
-            });
-            
-            if (response.ok) {
-                console.log(`Heartbeat envoyé: ${status}, widget: ${isWidgetOpen}`);
-            } else {
-                console.error('Erreur heartbeat:', await response.text());
-            }
-        } catch (error) {
-            console.error('Erreur lors de l\'envoi du heartbeat:', error);
+        if (response.ok) {
+            console.log(`Heartbeat envoyé: ${status}, widget: ${isWidgetOpen}`);
+        } else {
+            const errorText = await response.text();
+            console.error('Erreur heartbeat:', errorText);
         }
+    } catch (error) {
+        console.error('Erreur lors de l\'envoi du heartbeat:', error);
     }
+}
 
     // Fonction pour démarrer le heartbeat
     function startHeartbeat() {
