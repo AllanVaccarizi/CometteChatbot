@@ -1221,6 +1221,9 @@
             const validatedMessage = validateMessage(message);
             await initializeSession();
 
+            // Masquer les questions prédéfinies dès qu'un message est envoyé
+            hidePredefinedMessages();
+
             const messageData = {
                 action: "sendMessage",
                 sessionId: currentSessionId,
