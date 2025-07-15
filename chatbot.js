@@ -60,34 +60,62 @@
         }
 
         .n8n-chat-widget .brand-header {
-            padding: 16px;
+            padding: 8px 12px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            justify-content: space-between;
+            gap: 8px;
             border-bottom: 1px solid rgba(255, 128, 0, 0.1);
             position: relative;
             background: linear-gradient(135deg, var(--chat--color-primary) 0%, var(--chat--color-secondary) 100%);
             cursor: pointer;
             user-select: none;
+            min-height: 44px; /* Hauteur minimale contrôlée */
+            max-height: 50px; /* Hauteur maximale pour éviter l'expansion */
         }
 
         .n8n-chat-widget .close-button {
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
             background: none;
             border: none;
             color: #ffffff;
             cursor: pointer;
-            padding: 4px;
+            padding: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: color 0.2s;
-            font-size: 20px;
+            font-size: 18px;
             opacity: 0.8;
             font-weight: bold;
+            flex-shrink: 0; /* Empêche le rétrécissement */
+        }
+
+        .n8n-chat-widget .clear-history-button {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+            cursor: pointer;
+            padding: 3px 6px; /* Padding réduit */
+            font-size: 10px; /* Taille de police réduite */
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            border-radius: 3px; /* Border-radius réduit */
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.3px; /* Letter-spacing réduit */
+            line-height: 1; /* Line-height fixe */
+            height: 20px; /* Hauteur fixe */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0; /* Empêche le rétrécissement */
+            white-space: nowrap; /* Empêche le retour à la ligne */
+        }
+
+        .n8n-chat-widget .clear-history-button:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-1px);
         }
 
         .n8n-chat-widget .close-button:hover {
