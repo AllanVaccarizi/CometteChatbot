@@ -737,37 +737,71 @@
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqZHV1dHh5ZXF2dnBxYmVyc3dmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMwNjM1NTUsImV4cCI6MjA1ODYzOTU1NX0.xAa_oHU52QKEgQDKYgtERCGcTsKgUE63f8BhAvsrw4g';
     const tableName = 'comette_chat';
 
+    // ✅ FONCTION POUR MARQUER UNE SESSION COMME OFFLINE
+    async function markSessionOffline(sessionId) {
+        if (!sessionId) return;
+        
+        try {
+            const now = new Date();
+            const frenchTime = new Date(now.getTime() + (2 * 60 * 60 * 1000));
+            const frenchTimestamp = frenchTime.toISOString();
+            
+            const response = await fetch(`${supabaseUrl}/rest/v1/${tableName}?session_id=eq.${sessionId}`, {
+                method: 'PATCH',
+                headers: {
+                    'apikey': supabaseKey,
+                    'Authorization': `Bearer ${supabaseKey}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify({
+                    user_status: 'offline',
+                    chatbot_open: false,
+                    last_activity: frenchTimestamp
+                })
+            });
+            
+            if (response.ok) {
+                console.log(`✅ Session ${sessionId} marquée comme offline`);
+            } else {
+                console.error('❌ Erreur lors du marquage offline:', await response.text());
+            }
+        } catch (error) {
+            console.error('❌ Erreur markSessionOffline:', error);
+        }
+    }
+
     // Fonction pour envoyer un heartbeat
     async function sendHeartbeat(status = 'online') {
-    if (!currentSessionId) return;
-    
-    try {
-        const response = await fetch(`${supabaseUrl}/rest/v1/${tableName}?session_id=eq.${currentSessionId}`, {
-            method: 'PATCH',
-            headers: {
-                'apikey': supabaseKey,
-                'Authorization': `Bearer ${supabaseKey}`,
-                'Content-Type': 'application/json',
-                'Prefer': 'return=minimal'
-            },
-            body: JSON.stringify({
-                user_status: status,
-                chatbot_open: isWidgetOpen,
-                last_heartbeat: new Date().toISOString(),
-                last_activity: new Date().toISOString()
-            })
-        });
+        if (!currentSessionId) return;
         
-        if (response.ok) {
-            console.log(`Heartbeat envoyé: ${status}, widget: ${isWidgetOpen}`);
-        } else {
-            const errorText = await response.text();
-            console.error('Erreur heartbeat:', errorText);
+        try {
+            const response = await fetch(`${supabaseUrl}/rest/v1/${tableName}?session_id=eq.${currentSessionId}`, {
+                method: 'PATCH',
+                headers: {
+                    'apikey': supabaseKey,
+                    'Authorization': `Bearer ${supabaseKey}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify({
+                    user_status: status,
+                    chatbot_open: isWidgetOpen,
+                    last_heartbeat: new Date().toISOString(),
+                    last_activity: new Date().toISOString()
+                })
+            });
+            
+            if (response.ok) {
+                console.log(`Heartbeat envoyé: ${status}, widget: ${isWidgetOpen}`);
+            } else {
+                const errorText = await response.text();
+                console.error('Erreur heartbeat:', errorText);
+            }
+        } catch (error) {
+            console.error('Erreur lors de l\'envoi du heartbeat:', error);
         }
-    } catch (error) {
-        console.error('Erreur lors de l\'envoi du heartbeat:', error);
     }
-}
 
     // Fonction pour démarrer le heartbeat
     function startHeartbeat() {
@@ -910,10 +944,21 @@
             return (Date.now() - history.lastActivity) > this.persistDuration;
         }
 
-        // Nettoyer l'historique
+        // ✅ NETTOYER L'HISTORIQUE ET MARQUER L'ANCIENNE SESSION COMME OFFLINE
         clearHistory() {
+            // ✅ RÉCUPÉRER L'ANCIEN SESSION ID AVANT DE L'EFFACER
+            const oldSessionId = localStorage.getItem(this.sessionKey);
+            
+            // ✅ MARQUER L'ANCIENNE SESSION COMME OFFLINE
+            if (oldSessionId && oldSessionId !== currentSessionId) {
+                markSessionOffline(oldSessionId);
+                console.log(`🧹 Ancienne session ${oldSessionId} marquée comme offline lors du clear`);
+            }
+            
             localStorage.removeItem(this.storageKey);
             localStorage.removeItem(this.sessionKey);
+            
+            console.log('🧹 Historique effacé et ancienne session marquée offline');
         }
 
         // Générer un ID unique pour un message
@@ -921,12 +966,15 @@
             return Date.now().toString(36) + Math.random().toString(36).substr(2);
         }
 
-        // Obtenir ou créer un ID de session persistant
+        // ✅ OBTENIR OU CRÉER UN ID DE SESSION PERSISTANT
         getOrCreateSessionId() {
             let sessionId = localStorage.getItem(this.sessionKey);
             if (!sessionId) {
                 sessionId = this.generateUUID();
                 localStorage.setItem(this.sessionKey, sessionId);
+                console.log(`🆔 Nouvelle session créée: ${sessionId}`);
+            } else {
+                console.log(`🆔 Session existante récupérée: ${sessionId}`);
             }
             return sessionId;
         }
@@ -1144,14 +1192,20 @@
     // Récupérer l'ID de session persistant
     currentSessionId = chatHistory.getOrCreateSessionId();
 
-    // Gestionnaire pour effacer l'historique
+    // ✅ GESTIONNAIRE POUR EFFACER L'HISTORIQUE
     clearHistoryButton.addEventListener('click', (e) => {
         e.stopPropagation();
         if (confirm('Êtes-vous sûr de vouloir effacer tout l\'historique des messages ?')) {
+            // ✅ MARQUER L'ANCIENNE SESSION COMME OFFLINE AVANT DE LA SUPPRIMER
+            const oldSessionId = currentSessionId;
+            
             chatHistory.clearHistory();
             messagesContainer.innerHTML = '';
-            // Réinitialiser l'ID de session
+            
+            // ✅ RÉINITIALISER L'ID DE SESSION
             currentSessionId = chatHistory.getOrCreateSessionId();
+            console.log(`🔄 Changement de session: ${oldSessionId} → ${currentSessionId}`);
+            
             // Réafficher les messages pré-rédigés
             showPredefinedMessages();
             // Ajouter le message de bienvenue
@@ -1415,126 +1469,6 @@
             userMessageDiv.textContent = validatedMessage;
             messagesContainer.appendChild(userMessageDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
-            // Sauvegarder le message utilisateur dans l'historique
-            chatHistory.saveMessage({
-                type: 'user',
-                content: validatedMessage,
-                isHtml: false
-            });
-
-            const typingContainer = createTypingIndicatorWithMessage();
-            messagesContainer.appendChild(typingContainer);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), config.security.requestTimeout);
-
-            const response = await fetch(config.webhook.url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(messageData),
-                signal: controller.signal
-            });
-            
-            clearTimeout(timeoutId);
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
-            
-            const data = await response.json();
-            
-            if (!data || (Array.isArray(data) && !data[0]?.output) || (!Array.isArray(data) && !data.output)) {
-                throw new Error('Réponse invalide du serveur');
-            }
-            
-            console.log("Response data:", data);
-            
-            if (messagesContainer.contains(typingContainer)) {
-                messagesContainer.removeChild(typingContainer);
-            }
-            
-            const botMessageDiv = document.createElement('div');
-            botMessageDiv.className = 'chat-message bot';
-            
-            const avatarDiv = document.createElement('div');
-            avatarDiv.className = 'bot-avatar';
-            botMessageDiv.appendChild(avatarDiv);
-            
-            const textContainer = document.createElement('span');
-            botMessageDiv.appendChild(textContainer);
-            
-            let messageText = Array.isArray(data) ? data[0].output : data.output;
-            
-            if (typeof messageText === 'string') {
-                messagesContainer.appendChild(botMessageDiv);
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                
-                let processedText = messageText;
-                let isHtml = false;
-                
-                if (messageText.trim().startsWith('<html>') && messageText.trim().endsWith('</html>')) {
-                    processedText = messageText.replace(/<html>|<\/html>/g, '').trim();
-                    isHtml = true;
-                } else {
-                    processedText = convertMarkdownToHtml(messageText);
-                    isHtml = true;
-                }
-
-                // Sauvegarder la réponse du bot dans l'historique
-                chatHistory.saveMessage({
-                    type: 'bot',
-                    content: processedText,
-                    isHtml: isHtml
-                });
-                
-                typeWriter(textContainer, processedText, 20);
-            } else {
-                throw new Error('Réponse invalide du serveur');
-            }
-            
-        } catch (error) {
-            console.error('Erreur dans sendMessage:', error);
-            
-            const existingTypingContainer = messagesContainer.querySelector('.typing-container');
-            if (existingTypingContainer) {
-                messagesContainer.removeChild(existingTypingContainer);
-            }
-            
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'chat-message bot';
-            
-            const avatarDiv = document.createElement('div');
-            avatarDiv.className = 'bot-avatar';
-            errorDiv.appendChild(avatarDiv);
-            
-            const textContainer = document.createElement('span');
-            errorDiv.appendChild(textContainer);
-            
-            let errorMessage;
-            if (error.message.includes('trop long') || error.message.includes('non autorisé') || error.message.includes('invalide')) {
-                errorMessage = error.message;
-            } else if (error.name === 'AbortError') {
-                errorMessage = "La requête a pris trop de temps. Veuillez réessayer.";
-            } else {
-                errorMessage = "Désolé, une erreur est survenue. Veuillez réessayer.";
-            }
-
-            textContainer.textContent = errorMessage;
-            messagesContainer.appendChild(errorDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
-            // Sauvegarder le message d'erreur dans l'historique
-            chatHistory.saveMessage({
-                type: 'bot',
-                content: errorMessage,
-                isHtml: false
-            });
-        }
-    }
 
     async function sendMessageBackground(message, existingTypingContainer) {
         try {
@@ -1810,48 +1744,194 @@
 
     // === GESTION DES ÉVÉNEMENTS DE FERMETURE DE PAGE ===
     
-    // Gestion des événements de fermeture de page
-    window.addEventListener('beforeunload', () => {
-        // Envoyer un statut offline avant la fermeture
-        if (isWidgetOpen && currentSessionId) {
-            navigator.sendBeacon(
-                `${supabaseUrl}/rest/v1/${tableName}?session_id=eq.${currentSessionId}`,
-                JSON.stringify({
-                    user_status: 'offline',
-                    chatbot_open: false,
-                    last_activity: new Date().toISOString()
-                })
-            );
+    // ✅ FONCTION POUR GÉRER LA FERMETURE PROPRE
+    function handlePageUnload() {
+        console.log('🔄 Fermeture de page détectée');
+        
+        // Marquer la session comme offline
+        if (currentSessionId) {
+            // Utiliser sendBeacon pour envoyer de manière fiable
+            const data = JSON.stringify({
+                user_status: 'offline',
+                chatbot_open: false,
+                last_activity: new Date().toISOString()
+            });
+            
+            const url = `${supabaseUrl}/rest/v1/${tableName}?session_id=eq.${currentSessionId}`;
+            
+            // Essayer sendBeacon d'abord (plus fiable)
+            if (navigator.sendBeacon) {
+                const headers = new Headers();
+                headers.append('apikey', supabaseKey);
+                headers.append('Authorization', `Bearer ${supabaseKey}`);
+                headers.append('Content-Type', 'application/json');
+                headers.append('Prefer', 'return=minimal');
+                
+                // Créer un blob avec les headers
+                const blob = new Blob([data], { type: 'application/json' });
+                
+                // Note: sendBeacon ne peut pas envoyer de headers personnalisés facilement
+                // On utilise fetch avec keepalive à la place
+                fetch(url, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': supabaseKey,
+                        'Authorization': `Bearer ${supabaseKey}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: data,
+                    keepalive: true // Important pour que ça marche pendant la fermeture
+                }).catch(error => {
+                    console.error('❌ Erreur lors du markage offline:', error);
+                });
+            }
         }
         
+        // Nettoyer les timers
+        if (heartbeatTimer) {
+            clearInterval(heartbeatTimer);
+        }
         if (sessionTimeout) {
             clearTimeout(sessionTimeout);
         }
-    });
+    }
 
-    // Gestion de la visibilité de la page
+    // Gestion des événements de fermeture de page
+    window.addEventListener('beforeunload', handlePageUnload);
+    
+    // Gestion alternative pour certains navigateurs
+    window.addEventListener('unload', handlePageUnload);
+    
+    // ✅ GESTION AMÉLIORÉE DE LA VISIBILITÉ DE LA PAGE
     document.addEventListener('visibilitychange', () => {
         if (isWidgetOpen) {
             if (document.hidden) {
+                console.log('👁️ Page cachée - statut away');
                 sendHeartbeat('away');
             } else {
+                console.log('👁️ Page visible - statut online');
                 sendHeartbeat('online');
             }
         }
     });
 
-    // Gestion de la perte de focus
+    // Gestion de la perte de focus de la fenêtre
     window.addEventListener('blur', () => {
         if (isWidgetOpen) {
+            console.log('🔍 Fenêtre perdue focus - statut away');
             sendHeartbeat('away');
         }
     });
 
-    // Gestion du retour de focus
+    // Gestion du retour de focus de la fenêtre
     window.addEventListener('focus', () => {
         if (isWidgetOpen) {
+            console.log('🔍 Fenêtre focus récupéré - statut online');
             sendHeartbeat('online');
         }
     });
 
-})();
+    // ✅ GESTION DU CHANGEMENT D'ONGLET OU FERMETURE BRUTALE
+    window.addEventListener('pagehide', (event) => {
+        console.log('📄 Page hide détecté');
+        handlePageUnload();
+    });
+
+    // ✅ DÉTECTION DES FERMETURES MOBILES
+    if ('serviceWorker' in navigator) {
+        // Détecter si l'utilisateur quitte vraiment la page
+        let isReloading = false;
+        
+        window.addEventListener('beforeunload', (event) => {
+            // Vérifier si c'est un rechargement ou une vraie fermeture
+            if (performance.navigation.type === performance.navigation.TYPE_RELOAD) {
+                isReloading = true;
+                console.log('🔄 Rechargement de page détecté - pas de markage offline');
+            } else {
+                console.log('❌ Fermeture de page détectée - markage offline');
+                handlePageUnload();
+            }
+        });
+    }
+
+    console.log('✅ Chatbot initialisé avec gestion offline améliorée');
+
+        } 
+        catch (error) {
+            console.error('Erreur:', error);
+        };
+
+            const typingContainer = createTypingIndicatorWithMessage();
+            messagesContainer.appendChild(typingContainer);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), config.security.requestTimeout);
+
+            const response = await fetch(config.webhook.url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(messageData),
+                signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (!data || (Array.isArray(data) && !data[0]?.output) || (!Array.isArray(data) && !data.output)) {
+                throw new Error('Réponse invalide du serveur');
+            }
+            
+            console.log("Response data:", data);
+            
+            if (messagesContainer.contains(typingContainer)) {
+                messagesContainer.removeChild(typingContainer);
+            }
+            
+            const botMessageDiv = document.createElement('div');
+            botMessageDiv.className = 'chat-message bot';
+            
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = 'bot-avatar';
+            botMessageDiv.appendChild(avatarDiv);
+            
+            const textContainer = document.createElement('span');
+            botMessageDiv.appendChild(textContainer);
+            
+            let messageText = Array.isArray(data) ? data[0].output : data.output;
+            
+            if (typeof messageText === 'string') {
+                messagesContainer.appendChild(botMessageDiv);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                
+                let processedText = messageText;
+                let isHtml = false;
+                
+                if (messageText.trim().startsWith('<html>') && messageText.trim().endsWith('</html>')) {
+                    processedText = messageText.replace(/<html>|<\/html>/g, '').trim();
+                    isHtml = true;
+                } else {
+                    processedText = convertMarkdownToHtml(messageText);
+                    isHtml = true;
+                }
+
+                // Sauvegarder la réponse du bot dans l'historique
+                chatHistory.saveMessage({
+                    type: 'bot',
+                    content: processedText,
+                    isHtml: isHtml
+                });
+                
+                typeWriter(textContainer, processedText, 20);
+            } else {
+                throw new Error('Réponse invalide du serveur');
+            }
+    }})
