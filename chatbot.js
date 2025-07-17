@@ -731,6 +731,8 @@
     const HEARTBEAT_INTERVAL = 15000; // 15 secondes
     let heartbeatTimer = null;
     let isWidgetOpen = false;
+    let isPageUnloading = false;
+    const STORAGE_HEARTBEAT_KEY = 'chatbot_last_heartbeat';
 
     // Configuration Supabase pour heartbeat
     const supabaseUrl = 'https://jjduutxyeqvvpqberswf.supabase.co';
@@ -740,7 +742,7 @@
     // Fonction pour envoyer un heartbeat
     async function sendHeartbeat(status = 'online') {
     if (!currentSessionId) return;
-    
+    localStorage.setItem(STORAGE_HEARTBEAT_KEY, Date.now().toString());
     try {
         const response = await fetch(`${supabaseUrl}/rest/v1/${tableName}?session_id=eq.${currentSessionId}`, {
             method: 'PATCH',
@@ -766,6 +768,36 @@
         }
     } catch (error) {
         console.error('Erreur lors de l\'envoi du heartbeat:', error);
+    }
+}
+
+// ✅ FONCTION POUR MARQUER UNE SESSION COMME OFFLINE
+async function markSessionOffline(sessionId) {
+    if (!sessionId) return;
+    
+    try {
+        const response = await fetch(`${supabaseUrl}/rest/v1/${tableName}?session_id=eq.${sessionId}`, {
+            method: 'PATCH',
+            headers: {
+                'apikey': supabaseKey,
+                'Authorization': `Bearer ${supabaseKey}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=minimal'
+            },
+            body: JSON.stringify({
+                user_status: 'offline',
+                chatbot_open: false,
+                last_activity: new Date().toISOString()
+            })
+        });
+        
+        if (response.ok) {
+            console.log(`✅ Session ${sessionId} marquée comme offline`);
+        } else {
+            console.error('❌ Erreur lors du marquage offline:', await response.text());
+        }
+    } catch (error) {
+        console.error('❌ Erreur lors du marquage offline:', error);
     }
 }
 
@@ -797,6 +829,54 @@
         // Envoyer un dernier heartbeat "offline"
         sendHeartbeat('offline');
     }
+
+    // ✅ AMÉLIORATION DE LA GESTION DE FERMETURE DE PAGE
+async function handlePageClose() {
+    if (isPageUnloading) return;
+    isPageUnloading = true;
+    
+    console.log('🔄 Fermeture de page détectée');
+    
+    if (currentSessionId) {
+        try {
+            // Essayer d'abord avec fetch (plus fiable)
+            await fetch(`${supabaseUrl}/rest/v1/${tableName}?session_id=eq.${currentSessionId}`, {
+                method: 'PATCH',
+                headers: {
+                    'apikey': supabaseKey,
+                    'Authorization': `Bearer ${supabaseKey}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify({
+                    user_status: 'offline',
+                    chatbot_open: false,
+                    last_activity: new Date().toISOString()
+                }),
+                keepalive: true // Important pour beforeunload
+            });
+            console.log('✅ Session marquée offline via fetch');
+        } catch (error) {
+            console.error('❌ Fetch échoué, tentative avec sendBeacon:', error);
+            
+            // Fallback avec sendBeacon
+            const data = JSON.stringify({
+                user_status: 'offline',
+                chatbot_open: false,
+                last_activity: new Date().toISOString()
+            });
+            
+            navigator.sendBeacon(
+                `${supabaseUrl}/rest/v1/${tableName}?session_id=eq.${currentSessionId}`,
+                new Blob([data], { type: 'application/json' })
+            );
+        }
+    }
+    
+    // Arrêter le heartbeat
+    stopHeartbeat();
+}
+    
 
     // Fonction pour gérer l'ouverture du widget
     function onWidgetOpen() {
@@ -1145,19 +1225,29 @@
     currentSessionId = chatHistory.getOrCreateSessionId();
 
     // Gestionnaire pour effacer l'historique
-    clearHistoryButton.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (confirm('Êtes-vous sûr de vouloir effacer tout l\'historique des messages ?')) {
-            chatHistory.clearHistory();
-            messagesContainer.innerHTML = '';
-            // Réinitialiser l'ID de session
-            currentSessionId = chatHistory.getOrCreateSessionId();
-            // Réafficher les messages pré-rédigés
-            showPredefinedMessages();
-            // Ajouter le message de bienvenue
-            setTimeout(() => addWelcomeMessage(), 300);
+    clearHistoryButton.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    if (confirm('Êtes-vous sûr de vouloir effacer tout l\'historique des messages ?')) {
+        // ✅ MARQUER L'ANCIENNE SESSION COMME OFFLINE AVANT D'EFFACER
+        const oldSessionId = currentSessionId;
+        
+        if (oldSessionId) {
+            await markSessionOffline(oldSessionId);
+            console.log(`✅ Ancienne session ${oldSessionId} marquée offline`);
         }
-    });
+        
+        // Effacer l'historique et créer nouvelle session
+        chatHistory.clearHistory();
+        currentSessionId = chatHistory.getOrCreateSessionId();
+        
+        console.log(`✅ Nouvelle session créée: ${currentSessionId}`);
+        
+        // Nettoyer l'interface
+        messagesContainer.innerHTML = '';
+        showPredefinedMessages();
+        setTimeout(() => addWelcomeMessage(), 300);
+    }
+});
 
     // Auto-open chatbot seulement si c'est la première visite ET qu'il n'a jamais été fermé
     if (!chatHasBeenOpened && !chatHasBeenClosed) {
@@ -1722,7 +1812,14 @@
         }
     });
 
-    function closeChatbot() {
+        function closeChatbot() {
+        console.log('🔄 Fermeture du chatbot');
+        
+        // ✅ Marquer comme away mais pas offline (juste fermé)
+        if (currentSessionId) {
+            sendHeartbeat('away');
+        }
+        
         onWidgetClose(); // 🔹 AJOUT DU HEARTBEAT
         
         localStorage.setItem('chatbot_closed', 'true');
@@ -1810,24 +1907,24 @@
 
     // === GESTION DES ÉVÉNEMENTS DE FERMETURE DE PAGE ===
     
-    // Gestion des événements de fermeture de page
-    window.addEventListener('beforeunload', () => {
-        // Envoyer un statut offline avant la fermeture
-        if (isWidgetOpen && currentSessionId) {
-            navigator.sendBeacon(
-                `${supabaseUrl}/rest/v1/${tableName}?session_id=eq.${currentSessionId}`,
-                JSON.stringify({
-                    user_status: 'offline',
-                    chatbot_open: false,
-                    last_activity: new Date().toISOString()
-                })
-            );
-        }
-        
-        if (sessionTimeout) {
-            clearTimeout(sessionTimeout);
-        }
-    });
+    // ✅ GESTIONNAIRES D'ÉVÉNEMENTS AMÉLIORÉS
+        window.addEventListener('beforeunload', handlePageClose);
+        window.addEventListener('unload', handlePageClose);
+
+        // Gestion de la visibilité de la page (plus fiable)
+        document.addEventListener('visibilitychange', async () => {
+            if (document.hidden) {
+                // Page cachée/minimisée
+                if (isWidgetOpen) {
+                    await sendHeartbeat('away');
+                }
+            } else {
+                // Page visible à nouveau
+                if (isWidgetOpen) {
+                    await sendHeartbeat('online');
+                }
+            }
+        });
 
     // Gestion de la visibilité de la page
     document.addEventListener('visibilitychange', () => {
@@ -1853,5 +1950,17 @@
             sendHeartbeat('online');
         }
     });
+
+// ✅ GESTION DES ONGLETS MULTIPLES
+// Vérifier si d'autres onglets sont actifs
+setInterval(() => {
+    const lastHeartbeat = localStorage.getItem(STORAGE_HEARTBEAT_KEY);
+    if (lastHeartbeat && Date.now() - parseInt(lastHeartbeat) > 20000) {
+        // Aucun autre onglet actif depuis 20 secondes
+        if (currentSessionId && !isWidgetOpen) {
+            markSessionOffline(currentSessionId);
+        }
+    }
+}, 30000); // Vérifier toutes les 30 secondes
 
 })();
