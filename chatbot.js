@@ -698,6 +698,42 @@
             .n8n-chat-widget .chat-message.system-message {
                 animation: systemMessageAppear 0.5s ease-out;
             }
+                /* Styles pour les messages admin */
+            .n8n-chat-widget .chat-message.admin-message {
+                background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
+                border-left: 4px solid #10b981;
+                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+            }
+
+            .n8n-chat-widget .chat-message.admin-message .admin-avatar {
+                background-color: #10b981 !important;
+                background-image: none !important;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .n8n-chat-widget .chat-message.admin-message .admin-avatar::after {
+                content: "👤";
+                font-size: 18px;
+                color: white;
+            }
+
+            /* Animation spéciale pour les messages admin */
+            @keyframes adminMessageAppear {
+                0% {
+                    opacity: 0;
+                    transform: translateY(10px) scale(0.95);
+                }
+                100% {
+                    opacity: 1;
+                    transform: translateY(0) scale(1);
+                }
+            }
+
+            .n8n-chat-widget .chat-message.admin-message {
+                animation: adminMessageAppear 0.4s ease-out;
+            }
         }
 `;
 
@@ -907,26 +943,26 @@ function disableAdminMode() {
     stopAdminMessageSync();
 }
 
-// Modifier l'apparence de l'interface selon le mode
-function updateInterfaceForAdmin(isAdminMode) {
-    const chatInput = document.querySelector('.chat-input');
-    const textarea = chatInput.querySelector('textarea');
-    const sendButton = chatInput.querySelector('button[type="submit"]');
-    
-    if (isAdminMode) {
-        // Mode admin : interface modifiée
-        textarea.placeholder = "Un conseiller va vous répondre...";
-        sendButton.textContent = "Envoyer à un conseiller";
-        chatInput.style.borderTop = "3px solid #10b981";
-        chatInput.style.background = "linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, transparent 100%)";
-    } else {
-        // Mode normal : interface par défaut
-        textarea.placeholder = "Posez votre question...";
-        sendButton.textContent = "Envoyer";
-        chatInput.style.borderTop = "1px solid rgba(255, 128, 0, 0.1)";
-        chatInput.style.background = "var(--chat--color-background)";
+    // Modifier l'apparence de l'interface selon le mode
+    function updateInterfaceForAdmin(isAdminMode) {
+        const chatInput = document.querySelector('.chat-input');
+        const textarea = chatInput.querySelector('textarea');
+        const sendButton = chatInput.querySelector('button[type="submit"]');
+        
+        if (isAdminMode) {
+            // Mode admin : interface modifiée
+            textarea.placeholder = "Un conseiller va vous répondre...";
+            sendButton.textContent = "Envoyer"; // ✅ GARDER "Envoyer" NORMAL
+            chatInput.style.borderTop = "3px solid #10b981";
+            chatInput.style.background = "linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, transparent 100%)";
+        } else {
+            // Mode normal : interface par défaut
+            textarea.placeholder = "Posez votre question...";
+            sendButton.textContent = "Envoyer";
+            chatInput.style.borderTop = "1px solid rgba(255, 128, 0, 0.1)";
+            chatInput.style.background = "var(--chat--color-background)";
+        }
     }
-}
 
 // Ajouter un message système dans l'interface
 function addSystemMessage(message) {
@@ -961,6 +997,126 @@ function stopAdminStatusCheck() {
         clearInterval(adminStatusInterval);
         adminStatusInterval = null;
         console.log('🔍 Polling admin status arrêté');
+    }
+}
+
+// === SYNCHRONISATION DES MESSAGES ADMIN ===
+
+let adminMessageSyncInterval = null;
+let lastMessageId = null;
+
+// Démarrer la synchronisation des messages admin
+function startAdminMessageSync() {
+    // Récupérer l'ID du dernier message actuel
+    getLastMessageId();
+    
+    // Démarrer le polling toutes les 2 secondes
+    adminMessageSyncInterval = setInterval(checkForNewAdminMessages, 2000);
+    console.log('🔄 Synchronisation messages admin démarrée');
+}
+
+// Arrêter la synchronisation
+function stopAdminMessageSync() {
+    if (adminMessageSyncInterval) {
+        clearInterval(adminMessageSyncInterval);
+        adminMessageSyncInterval = null;
+        console.log('🔄 Synchronisation messages admin arrêtée');
+    }
+}
+
+// Récupérer l'ID du dernier message
+async function getLastMessageId() {
+    if (!currentSessionId) return;
+    
+    try {
+        const response = await fetch(`${supabaseUrl}/rest/v1/${tableName}?session_id=eq.${currentSessionId}&select=id&order=created_at.desc&limit=1`, {
+            headers: {
+                'apikey': supabaseKey,
+                'Authorization': `Bearer ${supabaseKey}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            if (data && data.length > 0) {
+                lastMessageId = data[0].id;
+                console.log('📝 Dernier message ID:', lastMessageId);
+            }
+        }
+    } catch (error) {
+        console.error('Erreur récupération dernier message ID:', error);
+    }
+}
+
+// Vérifier s'il y a de nouveaux messages admin
+async function checkForNewAdminMessages() {
+    if (!currentSessionId || !isAdminControlActive) return;
+    
+    try {
+        let query = `${supabaseUrl}/rest/v1/${tableName}?session_id=eq.${currentSessionId}&is_admin_message=eq.true&select=id,message,created_at&order=created_at.asc`;
+        
+        // Si on a un dernier message ID, récupérer seulement les nouveaux
+        if (lastMessageId) {
+            query += `&id=gt.${lastMessageId}`;
+        }
+        
+        const response = await fetch(query, {
+            headers: {
+                'apikey': supabaseKey,
+                'Authorization': `Bearer ${supabaseKey}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const newMessages = await response.json();
+            
+            if (newMessages && newMessages.length > 0) {
+                console.log('📨 Nouveaux messages admin reçus:', newMessages.length);
+                
+                // Afficher chaque nouveau message
+                newMessages.forEach(messageRow => {
+                    displayAdminMessage(messageRow);
+                    lastMessageId = Math.max(lastMessageId || 0, messageRow.id);
+                });
+            }
+        }
+    } catch (error) {
+        console.error('Erreur vérification nouveaux messages admin:', error);
+    }
+}
+
+// Afficher un message admin dans l'interface
+function displayAdminMessage(messageRow) {
+    try {
+        // Parser le message JSON
+        const messageData = typeof messageRow.message === 'string' 
+            ? JSON.parse(messageRow.message) 
+            : messageRow.message;
+        
+        // Créer l'élément message
+        const adminMessageDiv = document.createElement('div');
+        adminMessageDiv.className = 'chat-message bot admin-message';
+        
+        // Avatar spécial pour les messages admin
+        const avatarDiv = document.createElement('div');
+        avatarDiv.className = 'bot-avatar admin-avatar';
+        adminMessageDiv.appendChild(avatarDiv);
+        
+        // Contenu du message
+        const textContainer = document.createElement('span');
+        textContainer.innerHTML = messageData.content;
+        adminMessageDiv.appendChild(textContainer);
+        
+        // Ajouter à l'interface
+        messagesContainer.appendChild(adminMessageDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        
+        console.log('✅ Message admin affiché:', messageData.content);
+        
+    } catch (error) {
+        console.error('Erreur affichage message admin:', error);
     }
 }
 
