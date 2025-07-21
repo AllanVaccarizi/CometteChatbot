@@ -660,6 +660,44 @@
             .n8n-chat-widget .chat-popup.position-left {
                 left: 3vw;
             }
+            
+            /* Styles pour les messages système */
+            .n8n-chat-widget .chat-message.system-message {
+                background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
+                border-left: 4px solid #10b981;
+                margin: 12px 0;
+                font-style: italic;
+            }
+
+            .n8n-chat-widget .chat-message.system-message .bot-avatar {
+                border-color: #10b981;
+                background-image: none;
+                background-color: #10b981;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .n8n-chat-widget .chat-message.system-message .bot-avatar::after {
+                content: "👤";
+                font-size: 18px;
+            }
+
+            /* Animation pour les messages système */
+            @keyframes systemMessageAppear {
+                0% {
+                    opacity: 0;
+                    transform: translateX(-20px);
+                }
+                100% {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+
+            .n8n-chat-widget .chat-message.system-message {
+                animation: systemMessageAppear 0.5s ease-out;
+            }
         }
 `;
 
@@ -801,6 +839,131 @@ async function markSessionOffline(sessionId) {
     }
 }
 
+// === INTÉGRATION ADMIN TAKEOVER ===
+
+let isAdminControlActive = false;
+let adminStatusInterval = null;
+
+// Fonction pour vérifier le statut admin
+async function checkAdminTakeover() {
+    if (!currentSessionId) return;
+    
+    try {
+        const response = await fetch(`${supabaseUrl}/rest/v1/${tableName}?session_id=eq.${currentSessionId}&select=admin_takeover,takeover_timestamp`, {
+            headers: {
+                'apikey': supabaseKey,
+                'Authorization': `Bearer ${supabaseKey}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            if (data && data.length > 0) {
+                const adminTakeover = data[0].admin_takeover;
+                
+                // Si le statut admin a changé
+                if (adminTakeover !== isAdminControlActive) {
+                    if (adminTakeover) {
+                        enableAdminMode();
+                    } else {
+                        disableAdminMode();
+                    }
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Erreur vérification admin takeover:', error);
+    }
+}
+
+// Activer le mode admin dans l'interface
+function enableAdminMode() {
+    isAdminControlActive = true;
+    console.log('🎛️ Mode admin activé côté utilisateur');
+    
+    // Ajouter un message système pour informer l'utilisateur
+    addSystemMessage('🧑‍💼 Un conseiller prend en charge votre conversation...');
+    
+    // Modifier l'interface utilisateur
+    updateInterfaceForAdmin(true);
+    
+    // Démarrer la synchronisation des messages admin
+    startAdminMessageSync();
+}
+
+// Désactiver le mode admin
+function disableAdminMode() {
+    isAdminControlActive = false;
+    console.log('🤖 Mode admin désactivé - retour au chatbot automatique');
+    
+    // Ajouter un message système
+    addSystemMessage('🤖 Retour au chatbot automatique. Comment puis-je vous aider ?');
+    
+    // Restaurer l'interface normale
+    updateInterfaceForAdmin(false);
+    
+    // Arrêter la synchronisation
+    stopAdminMessageSync();
+}
+
+// Modifier l'apparence de l'interface selon le mode
+function updateInterfaceForAdmin(isAdminMode) {
+    const chatInput = document.querySelector('.chat-input');
+    const textarea = chatInput.querySelector('textarea');
+    const sendButton = chatInput.querySelector('button[type="submit"]');
+    
+    if (isAdminMode) {
+        // Mode admin : interface modifiée
+        textarea.placeholder = "Un conseiller va vous répondre...";
+        sendButton.textContent = "Envoyer à un conseiller";
+        chatInput.style.borderTop = "3px solid #10b981";
+        chatInput.style.background = "linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, transparent 100%)";
+    } else {
+        // Mode normal : interface par défaut
+        textarea.placeholder = "Posez votre question...";
+        sendButton.textContent = "Envoyer";
+        chatInput.style.borderTop = "1px solid rgba(255, 128, 0, 0.1)";
+        chatInput.style.background = "var(--chat--color-background)";
+    }
+}
+
+// Ajouter un message système dans l'interface
+function addSystemMessage(message) {
+    const systemMessageDiv = document.createElement('div');
+    systemMessageDiv.className = 'chat-message bot system-message';
+    
+    const avatarDiv = document.createElement('div');
+    avatarDiv.className = 'bot-avatar';
+    systemMessageDiv.appendChild(avatarDiv);
+    
+    const textContainer = document.createElement('span');
+    textContainer.innerHTML = `<strong style="color: #10b981;">${message}</strong>`;
+    systemMessageDiv.appendChild(textContainer);
+    
+    messagesContainer.appendChild(systemMessageDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+// Démarrer le polling pour vérifier le statut admin
+function startAdminStatusCheck() {
+    // Vérifier immédiatement
+    checkAdminTakeover();
+    
+    // Puis vérifier toutes les 3 secondes
+    adminStatusInterval = setInterval(checkAdminTakeover, 3000);
+    console.log('🔍 Polling admin status démarré');
+}
+
+// Arrêter le polling admin
+function stopAdminStatusCheck() {
+    if (adminStatusInterval) {
+        clearInterval(adminStatusInterval);
+        adminStatusInterval = null;
+        console.log('🔍 Polling admin status arrêté');
+    }
+}
+
     // Fonction pour démarrer le heartbeat
     function startHeartbeat() {
         if (heartbeatTimer) return; // Éviter les doublons
@@ -878,18 +1041,19 @@ async function handlePageClose() {
 }
     
 
-    // Fonction pour gérer l'ouverture du widget
     function onWidgetOpen() {
-        isWidgetOpen = true;
-        startHeartbeat();
-        console.log('Widget ouvert - Heartbeat démarré');
+    isWidgetOpen = true;
+    startHeartbeat();
+    startAdminStatusCheck(); // ✅ AJOUTER CETTE LIGNE
+    console.log('Widget ouvert - Heartbeat et admin check démarrés');
     }
 
     // Fonction pour gérer la fermeture du widget
     function onWidgetClose() {
-        isWidgetOpen = false;
-        stopHeartbeat();
-        console.log('Widget fermé - Heartbeat arrêté');
+    isWidgetOpen = false;
+    stopHeartbeat();
+    stopAdminStatusCheck(); // ✅ AJOUTER CETTE LIGNE
+    console.log('Widget fermé - Heartbeat et admin check arrêtés');
     }
 
     // === GESTION DE L'HISTORIQUE ===
