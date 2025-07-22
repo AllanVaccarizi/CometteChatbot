@@ -1,36 +1,4 @@
 (function() {
-
-    // ============================================
-    // 🎨 CONFIGURATION DU CHATBOT
-    // ============================================
-    
-    // --- COULEURS ET STYLE ---
-    const CHATBOT_COLORS = {
-        primaryColor: '#6b837b',      // Couleur principale (orange)
-        secondaryColor: '#B19CD9',    // Couleur secondaire (jaune)
-        backgroundColor: '#ffffff',   // Fond du chatbot
-        fontColor: '#1B1919',        // Couleur du texte
-        position: 'right'            // Position: 'left' ou 'right'
-    };
-    
-    // --- AVATAR DU CHATBOT ---
-    const CHATBOT_AVATAR = 'https://comettecosmetics.com/wp-content/uploads/2024/11/Rectangle-5-2-1-768x797.png';
-    
-    // --- QUESTIONS FRÉQUENTES ---
-    const PREDEFINED_MESSAGES = [
-        "Quels produits conviennent à ma peau sensible ?",
-        "Comment choisir ma routine de soin naturelle ?",
-        "Vos produits sont-ils vraiment 100% biologiques ?",
-        "Avez-vous des coffrets cadeaux disponibles ?"
-    ];
-    
-    // --- CONFIGURATION WEBHOOK ---
-    const WEBHOOK_CONFIG = {
-        url: window.CHATBOT_WEBHOOK_URL || 'https://n8n.srv749948.hstgr.cloud/webhook/88707b4f-c9ba-4bd5-b1ae-4eecb628fa9d/chat',
-        route: 'general'
-    };
-    
-
     // Prevent multiple initializations
     if (window.GrowthAIChatWidgetInitialized) return;
     window.GrowthAIChatWidgetInitialized = true;
@@ -44,10 +12,10 @@
     // Create and inject styles
     const styles = `
         .n8n-chat-widget {
-            --chat--color-primary: var(--n8n-chat-primary-color, ${CHATBOT_COLORS.primaryColor});
-            --chat--color-secondary: var(--n8n-chat-secondary-color, ${CHATBOT_COLORS.secondaryColor});
-            --chat--color-background: var(--n8n-chat-background-color, ${CHATBOT_COLORS.backgroundColor});
-            --chat--color-font: var(--n8n-chat-font-color, ${CHATBOT_COLORS.fontColor});
+            --chat--color-primary: var(--n8n-chat-primary-color, #6b837b);
+            --chat--color-secondary: var(--n8n-chat-secondary-color, #B19CD9);
+            --chat--color-background: var(--n8n-chat-background-color, #ffffff);
+            --chat--color-font: var(--n8n-chat-font-color, #1B1919);
             font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
         }
         
@@ -380,7 +348,7 @@
             border-radius: 50%;
             background-size: cover;
             background-position: center;
-            background-image: url('${CHATBOT_AVATAR}');
+            background-image: url('https://comettecosmetics.com/wp-content/uploads/2024/11/Rectangle-5-2-1-768x797.png');
             border: 2px solid var(--chat--color-primary);
         }
 
@@ -514,10 +482,63 @@
             font-weight: bold;
         }
 
+        .n8n-chat-widget .chat-popup {
+            position: fixed;
+            bottom: calc(2vh + clamp(50px, 8vw, 60px) + 10px);
+            right: 2vw;
+            background: #DC2626;
+            color: #ffffff;
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-size: clamp(12px, 2.5vw, 14px);
+            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+            opacity: 0;
+            transform: scale(0) translateX(20px);
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            pointer-events: none;
+            z-index: 998;
+            cursor: pointer;
+            max-width: 200px;
+        }
+
+        .n8n-chat-widget .chat-popup.position-left {
+            right: auto;
+            left: 2vw;
+            transform: scale(0) translateX(-20px);
+        }
+
+        .n8n-chat-widget .chat-popup.show {
+            opacity: 1;
+            transform: scale(1) translateX(0);
+            pointer-events: auto;
+        }
+
+        .n8n-chat-widget .chat-popup::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            right: 30px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid #DC2626;
+        }
+
+        .n8n-chat-widget .chat-popup.position-left::after {
+            right: auto;
+            left: 30px;
+        }
 
         @keyframes popupBounce {
             0%, 100% { transform: scale(1) translateX(0); }
             50% { transform: scale(1.05) translateX(0); }
+        }
+
+        .n8n-chat-widget .chat-popup.show {
+            animation: popupBounce 2s ease-in-out infinite;
         }
 
         .n8n-chat-widget .chat-message strong {
@@ -588,6 +609,10 @@
             .n8n-chat-widget .chat-toggle.position-left {
                 left: 1vw;
             }
+            
+            .n8n-chat-widget .chat-popup {
+                display: none !important;
+            }
         }
 
         /* Media queries pour très petits écrans */
@@ -627,6 +652,88 @@
                 left: 3vw;
             }
             
+            .n8n-chat-widget .chat-popup {
+                bottom: calc(3vh + 60px + 10px);
+                right: 3vw;
+            }
+            
+            .n8n-chat-widget .chat-popup.position-left {
+                left: 3vw;
+            }
+            
+            /* Styles pour les messages système */
+            .n8n-chat-widget .chat-message.system-message {
+                background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
+                border-left: 4px solid #10b981;
+                margin: 12px 0;
+                font-style: italic;
+            }
+
+            .n8n-chat-widget .chat-message.system-message .bot-avatar {
+                border-color: #10b981;
+                background-image: none;
+                background-color: #10b981;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .n8n-chat-widget .chat-message.system-message .bot-avatar::after {
+                content: "👤";
+                font-size: 18px;
+            }
+
+            /* Animation pour les messages système */
+            @keyframes systemMessageAppear {
+                0% {
+                    opacity: 0;
+                    transform: translateX(-20px);
+                }
+                100% {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+
+            .n8n-chat-widget .chat-message.system-message {
+                animation: systemMessageAppear 0.5s ease-out;
+            }
+                /* Styles pour les messages admin */
+            .n8n-chat-widget .chat-message.admin-message {
+                background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
+                border-left: 4px solid #10b981;
+                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+            }
+
+            .n8n-chat-widget .chat-message.admin-message .admin-avatar {
+                background-color: #10b981 !important;
+                background-image: none !important;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .n8n-chat-widget .chat-message.admin-message .admin-avatar::after {
+                content: "👤";
+                font-size: 18px;
+                color: white;
+            }
+
+            /* Animation spéciale pour les messages admin */
+            @keyframes adminMessageAppear {
+                0% {
+                    opacity: 0;
+                    transform: translateY(10px) scale(0.95);
+                }
+                100% {
+                    opacity: 1;
+                    transform: translateY(0) scale(1);
+                }
+            }
+
+            .n8n-chat-widget .chat-message.admin-message {
+                animation: adminMessageAppear 0.4s ease-out;
+            }
         }
 `;
 
@@ -637,11 +744,20 @@
 
     // Default configuration
     const defaultConfig = {
-        webhook: WEBHOOK_CONFIG,
+        webhook: {
+            url: window.CHATBOT_WEBHOOK_URL || 'https://n8n.srv749948.hstgr.cloud/webhook/88707b4f-c9ba-4bd5-b1ae-4eecb628fa9d/chat',
+            route: 'general'
+        },
         branding: {
             welcomeText: 'Besoin d\'aide ?',
         },
-        style: CHATBOT_COLORS,
+        style: {
+            primaryColor: '#6b837b',
+            secondaryColor: '#B19CD9',
+            position: 'right',
+            backgroundColor: '#ffffff',
+            fontColor: '#1B1919'
+        },
         security: {
             maxMessageLength: 2000,
             requestTimeout: 60000,
@@ -656,7 +772,12 @@
     };
 
     // Messages pré-rédigés
-    const predefinedMessages = PREDEFINED_MESSAGES;
+    const predefinedMessages = [
+        "Quels produits conviennent à ma peau sensible ?",
+        "Comment choisir ma routine de soin naturelle ?",
+        "Vos produits sont-ils vraiment 100% biologiques ?",
+        "Avez-vous des coffrets cadeaux disponibles ?"
+    ];
 
     // Merge user config with defaults
     const config = window.GrowthAIChatConfig ? 
@@ -678,6 +799,418 @@
     // Variables pour mémoriser l'état du chatbot
     let chatHasBeenClosed = localStorage.getItem('chatbot_closed') === 'true';
     let chatHasBeenOpened = localStorage.getItem('chatbot_opened') === 'true';
+
+    // === SYSTÈME DE HEARTBEAT === 
+    // Configuration du heartbeat
+    const HEARTBEAT_INTERVAL = 15000; // 15 secondes
+    let heartbeatTimer = null;
+    let isWidgetOpen = false;
+    let isPageUnloading = false;
+    const STORAGE_HEARTBEAT_KEY = 'chatbot_last_heartbeat';
+
+    // Configuration Supabase pour heartbeat
+    const supabaseUrl = 'https://jjduutxyeqvvpqberswf.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqZHV1dHh5ZXF2dnBxYmVyc3dmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMwNjM1NTUsImV4cCI6MjA1ODYzOTU1NX0.xAa_oHU52QKEgQDKYgtERCGcTsKgUE63f8BhAvsrw4g';
+    const tableName = 'comette_chat';
+
+    // Fonction pour envoyer un heartbeat
+    async function sendHeartbeat(status = 'online') {
+    if (!currentSessionId) return;
+    localStorage.setItem(STORAGE_HEARTBEAT_KEY, Date.now().toString());
+    try {
+        const response = await fetch(`${supabaseUrl}/rest/v1/${tableName}?session_id=eq.${currentSessionId}`, {
+            method: 'PATCH',
+            headers: {
+                'apikey': supabaseKey,
+                'Authorization': `Bearer ${supabaseKey}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=minimal'
+            },
+            body: JSON.stringify({
+                user_status: status,
+                chatbot_open: isWidgetOpen,
+                last_heartbeat: new Date().toISOString(),
+                last_activity: new Date().toISOString()
+            })
+        });
+        
+        if (response.ok) {
+            console.log(`Heartbeat envoyé: ${status}, widget: ${isWidgetOpen}`);
+        } else {
+            const errorText = await response.text();
+            console.error('Erreur heartbeat:', errorText);
+        }
+    } catch (error) {
+        console.error('Erreur lors de l\'envoi du heartbeat:', error);
+    }
+}
+
+// ✅ FONCTION POUR MARQUER UNE SESSION COMME OFFLINE
+async function markSessionOffline(sessionId) {
+    if (!sessionId) return;
+    
+    try {
+        const response = await fetch(`${supabaseUrl}/rest/v1/${tableName}?session_id=eq.${sessionId}`, {
+            method: 'PATCH',
+            headers: {
+                'apikey': supabaseKey,
+                'Authorization': `Bearer ${supabaseKey}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=minimal'
+            },
+            body: JSON.stringify({
+                user_status: 'offline',
+                chatbot_open: false,
+                last_activity: new Date().toISOString()
+            })
+        });
+        
+        if (response.ok) {
+            console.log(`✅ Session ${sessionId} marquée comme offline`);
+        } else {
+            console.error('❌ Erreur lors du marquage offline:', await response.text());
+        }
+    } catch (error) {
+        console.error('❌ Erreur lors du marquage offline:', error);
+    }
+}
+
+// === INTÉGRATION ADMIN TAKEOVER ===
+
+let isAdminControlActive = false;
+let adminStatusInterval = null;
+
+// Fonction pour vérifier le statut admin
+async function checkAdminTakeover() {
+    if (!currentSessionId) return;
+    
+    try {
+        const response = await fetch(`${supabaseUrl}/rest/v1/${tableName}?session_id=eq.${currentSessionId}&select=admin_takeover,takeover_timestamp`, {
+            headers: {
+                'apikey': supabaseKey,
+                'Authorization': `Bearer ${supabaseKey}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            if (data && data.length > 0) {
+                const adminTakeover = data[0].admin_takeover;
+                
+                // Si le statut admin a changé
+                if (adminTakeover !== isAdminControlActive) {
+                    if (adminTakeover) {
+                        enableAdminMode();
+                    } else {
+                        disableAdminMode();
+                    }
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Erreur vérification admin takeover:', error);
+    }
+}
+
+// Activer le mode admin dans l'interface
+function enableAdminMode() {
+    isAdminControlActive = true;
+    console.log('🎛️ Mode admin activé côté utilisateur');
+    
+    // Ajouter un message système pour informer l'utilisateur
+    addSystemMessage('🧑‍💼 Un conseiller prend en charge votre conversation...');
+    
+    // Modifier l'interface utilisateur
+    updateInterfaceForAdmin(true);
+    
+    // Démarrer la synchronisation des messages admin
+    startAdminMessageSync();
+}
+
+// Désactiver le mode admin
+function disableAdminMode() {
+    isAdminControlActive = false;
+    console.log('🤖 Mode admin désactivé - retour au chatbot automatique');
+    
+    // Ajouter un message système
+    addSystemMessage('🤖 Retour au chatbot automatique. Comment puis-je vous aider ?');
+    
+    // Restaurer l'interface normale
+    updateInterfaceForAdmin(false);
+    
+    // Arrêter la synchronisation
+    stopAdminMessageSync();
+}
+
+    // Modifier l'apparence de l'interface selon le mode
+    function updateInterfaceForAdmin(isAdminMode) {
+        const chatInput = document.querySelector('.chat-input');
+        const textarea = chatInput.querySelector('textarea');
+        const sendButton = chatInput.querySelector('button[type="submit"]');
+        
+        if (isAdminMode) {
+            // Mode admin : interface modifiée
+            textarea.placeholder = "Un conseiller va vous répondre...";
+            sendButton.textContent = "Envoyer"; // ✅ GARDER "Envoyer" NORMAL
+            chatInput.style.borderTop = "3px solid #10b981";
+            chatInput.style.background = "linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, transparent 100%)";
+        } else {
+            // Mode normal : interface par défaut
+            textarea.placeholder = "Posez votre question...";
+            sendButton.textContent = "Envoyer";
+            chatInput.style.borderTop = "1px solid rgba(255, 128, 0, 0.1)";
+            chatInput.style.background = "var(--chat--color-background)";
+        }
+    }
+
+// Ajouter un message système dans l'interface
+function addSystemMessage(message) {
+    const systemMessageDiv = document.createElement('div');
+    systemMessageDiv.className = 'chat-message bot system-message';
+    
+    const avatarDiv = document.createElement('div');
+    avatarDiv.className = 'bot-avatar';
+    systemMessageDiv.appendChild(avatarDiv);
+    
+    const textContainer = document.createElement('span');
+    textContainer.innerHTML = `<strong style="color: #10b981;">${message}</strong>`;
+    systemMessageDiv.appendChild(textContainer);
+    
+    messagesContainer.appendChild(systemMessageDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+// Démarrer le polling pour vérifier le statut admin
+function startAdminStatusCheck() {
+    // Vérifier immédiatement
+    checkAdminTakeover();
+    
+    // Puis vérifier toutes les 3 secondes
+    adminStatusInterval = setInterval(checkAdminTakeover, 3000);
+    console.log('🔍 Polling admin status démarré');
+}
+
+// Arrêter le polling admin
+function stopAdminStatusCheck() {
+    if (adminStatusInterval) {
+        clearInterval(adminStatusInterval);
+        adminStatusInterval = null;
+        console.log('🔍 Polling admin status arrêté');
+    }
+}
+
+// === SYNCHRONISATION DES MESSAGES ADMIN ===
+
+let adminMessageSyncInterval = null;
+let lastMessageId = null;
+
+// Démarrer la synchronisation des messages admin
+function startAdminMessageSync() {
+    // Récupérer l'ID du dernier message actuel
+    getLastMessageId();
+    
+    // Démarrer le polling toutes les 2 secondes
+    adminMessageSyncInterval = setInterval(checkForNewAdminMessages, 2000);
+    console.log('🔄 Synchronisation messages admin démarrée');
+}
+
+// Arrêter la synchronisation
+function stopAdminMessageSync() {
+    if (adminMessageSyncInterval) {
+        clearInterval(adminMessageSyncInterval);
+        adminMessageSyncInterval = null;
+        console.log('🔄 Synchronisation messages admin arrêtée');
+    }
+}
+
+// Récupérer l'ID du dernier message
+async function getLastMessageId() {
+    if (!currentSessionId) return;
+    
+    try {
+        const response = await fetch(`${supabaseUrl}/rest/v1/${tableName}?session_id=eq.${currentSessionId}&select=id&order=created_at.desc&limit=1`, {
+            headers: {
+                'apikey': supabaseKey,
+                'Authorization': `Bearer ${supabaseKey}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            if (data && data.length > 0) {
+                lastMessageId = data[0].id;
+                console.log('📝 Dernier message ID:', lastMessageId);
+            }
+        }
+    } catch (error) {
+        console.error('Erreur récupération dernier message ID:', error);
+    }
+}
+
+// Vérifier s'il y a de nouveaux messages admin
+async function checkForNewAdminMessages() {
+    if (!currentSessionId || !isAdminControlActive) return;
+    
+    try {
+        let query = `${supabaseUrl}/rest/v1/${tableName}?session_id=eq.${currentSessionId}&is_admin_message=eq.true&select=id,message,created_at&order=created_at.asc`;
+        
+        // Si on a un dernier message ID, récupérer seulement les nouveaux
+        if (lastMessageId) {
+            query += `&id=gt.${lastMessageId}`;
+        }
+        
+        const response = await fetch(query, {
+            headers: {
+                'apikey': supabaseKey,
+                'Authorization': `Bearer ${supabaseKey}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const newMessages = await response.json();
+            
+            if (newMessages && newMessages.length > 0) {
+                console.log('📨 Nouveaux messages admin reçus:', newMessages.length);
+                
+                // Afficher chaque nouveau message
+                newMessages.forEach(messageRow => {
+                    displayAdminMessage(messageRow);
+                    lastMessageId = Math.max(lastMessageId || 0, messageRow.id);
+                });
+            }
+        }
+    } catch (error) {
+        console.error('Erreur vérification nouveaux messages admin:', error);
+    }
+}
+
+// Afficher un message admin dans l'interface
+function displayAdminMessage(messageRow) {
+    try {
+        // Parser le message JSON
+        const messageData = typeof messageRow.message === 'string' 
+            ? JSON.parse(messageRow.message) 
+            : messageRow.message;
+        
+        // Créer l'élément message
+        const adminMessageDiv = document.createElement('div');
+        adminMessageDiv.className = 'chat-message bot admin-message';
+        
+        // Avatar spécial pour les messages admin
+        const avatarDiv = document.createElement('div');
+        avatarDiv.className = 'bot-avatar admin-avatar';
+        adminMessageDiv.appendChild(avatarDiv);
+        
+        // Contenu du message
+        const textContainer = document.createElement('span');
+        textContainer.innerHTML = messageData.content;
+        adminMessageDiv.appendChild(textContainer);
+        
+        // Ajouter à l'interface
+        messagesContainer.appendChild(adminMessageDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        
+        console.log('✅ Message admin affiché:', messageData.content);
+        
+    } catch (error) {
+        console.error('Erreur affichage message admin:', error);
+    }
+}
+
+    // Fonction pour démarrer le heartbeat
+    function startHeartbeat() {
+        if (heartbeatTimer) return; // Éviter les doublons
+        
+        // Envoyer immédiatement
+        sendHeartbeat('online');
+        
+        // Puis envoyer toutes les 15 secondes
+        heartbeatTimer = setInterval(() => {
+            if (isWidgetOpen) {
+                sendHeartbeat('online');
+            }
+        }, HEARTBEAT_INTERVAL);
+        
+        console.log('Heartbeat démarré');
+    }
+
+    // Fonction pour arrêter le heartbeat
+    function stopHeartbeat() {
+        if (heartbeatTimer) {
+            clearInterval(heartbeatTimer);
+            heartbeatTimer = null;
+            console.log('Heartbeat arrêté');
+        }
+        
+        // Envoyer un dernier heartbeat "offline"
+        sendHeartbeat('offline');
+    }
+
+    // ✅ AMÉLIORATION DE LA GESTION DE FERMETURE DE PAGE
+async function handlePageClose() {
+    if (isPageUnloading) return;
+    isPageUnloading = true;
+    
+    console.log('🔄 Fermeture de page détectée');
+    
+    if (currentSessionId) {
+        try {
+            // Essayer d'abord avec fetch (plus fiable)
+            await fetch(`${supabaseUrl}/rest/v1/${tableName}?session_id=eq.${currentSessionId}`, {
+                method: 'PATCH',
+                headers: {
+                    'apikey': supabaseKey,
+                    'Authorization': `Bearer ${supabaseKey}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify({
+                    user_status: 'offline',
+                    chatbot_open: false,
+                    last_activity: new Date().toISOString()
+                }),
+                keepalive: true // Important pour beforeunload
+            });
+            console.log('✅ Session marquée offline via fetch');
+        } catch (error) {
+            console.error('❌ Fetch échoué, tentative avec sendBeacon:', error);
+            
+            // Fallback avec sendBeacon
+            const data = JSON.stringify({
+                user_status: 'offline',
+                chatbot_open: false,
+                last_activity: new Date().toISOString()
+            });
+            
+            navigator.sendBeacon(
+                `${supabaseUrl}/rest/v1/${tableName}?session_id=eq.${currentSessionId}`,
+                new Blob([data], { type: 'application/json' })
+            );
+        }
+    }
+    
+    // Arrêter le heartbeat
+    stopHeartbeat();
+}
+    
+
+    function onWidgetOpen() {
+    isWidgetOpen = true;
+    startHeartbeat();
+    startAdminStatusCheck(); // ✅ AJOUTER CETTE LIGNE
+    console.log('Widget ouvert - Heartbeat et admin check démarrés');
+    }
+
+    // Fonction pour gérer la fermeture du widget
+    function onWidgetClose() {
+    isWidgetOpen = false;
+    stopHeartbeat();
+    stopAdminStatusCheck(); // ✅ AJOUTER CETTE LIGNE
+    console.log('Widget fermé - Heartbeat et admin check arrêtés');
+    }
 
     // === GESTION DE L'HISTORIQUE ===
     
@@ -988,21 +1521,17 @@
     const toggleButton = document.createElement('button');
     toggleButton.className = `chat-toggle${config.style.position === 'left' ? ' position-left' : ''}`;
     toggleButton.innerHTML = `
-        <div style="
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        ">Chat</div>
-    `;
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M12 2C6.477 2 2 6.477 2 12c0 1.821.487 3.53 1.338 5L2.5 21.5l4.5-.838A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18c-1.476 0-2.886-.313-4.156-.878l-3.156.586.586-3.156A7.962 7.962 0 014 12c0-4.411 3.589-8 8-8s8 3.589 8 8-3.589 8-8 8z"/>
+        </svg>`;
     
+    const chatPopup = document.createElement('div');
+    chatPopup.className = `chat-popup${config.style.position === 'left' ? ' position-left' : ''}`;
+    chatPopup.textContent = 'Une question ?';
     
     widgetContainer.appendChild(chatContainer);
     widgetContainer.appendChild(toggleButton);
+    widgetContainer.appendChild(chatPopup);
     document.body.appendChild(widgetContainer);
 
     const chatInterface = chatContainer.querySelector('.chat-interface');
@@ -1016,19 +1545,29 @@
     currentSessionId = chatHistory.getOrCreateSessionId();
 
     // Gestionnaire pour effacer l'historique
-    clearHistoryButton.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (confirm('Êtes-vous sûr de vouloir effacer tout l\'historique des messages ?')) {
-            chatHistory.clearHistory();
-            messagesContainer.innerHTML = '';
-            // Réinitialiser l'ID de session
-            currentSessionId = chatHistory.getOrCreateSessionId();
-            // Réafficher les messages pré-rédigés
-            showPredefinedMessages();
-            // Ajouter le message de bienvenue
-            setTimeout(() => addWelcomeMessage(), 300);
+    clearHistoryButton.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    if (confirm('Êtes-vous sûr de vouloir effacer tout l\'historique des messages ?')) {
+        // ✅ MARQUER L'ANCIENNE SESSION COMME OFFLINE AVANT D'EFFACER
+        const oldSessionId = currentSessionId;
+        
+        if (oldSessionId) {
+            await markSessionOffline(oldSessionId);
+            console.log(`✅ Ancienne session ${oldSessionId} marquée offline`);
         }
-    });
+        
+        // Effacer l'historique et créer nouvelle session
+        chatHistory.clearHistory();
+        currentSessionId = chatHistory.getOrCreateSessionId();
+        
+        console.log(`✅ Nouvelle session créée: ${currentSessionId}`);
+        
+        // Nettoyer l'interface
+        messagesContainer.innerHTML = '';
+        showPredefinedMessages();
+        setTimeout(() => addWelcomeMessage(), 300);
+    }
+});
 
     // Auto-open chatbot seulement si c'est la première visite ET qu'il n'a jamais été fermé
     if (!chatHasBeenOpened && !chatHasBeenClosed) {
@@ -1038,6 +1577,8 @@
             chatContainer.classList.add('open');
             chatHasBeenOpened = true;
             localStorage.setItem('chatbot_opened', 'true');
+            
+            onWidgetOpen(); // 🔹 AJOUT DU HEARTBEAT
             
             setTimeout(() => {
                 // Essayer de restaurer l'historique d'abord
@@ -1591,7 +2132,16 @@
         }
     });
 
-    function closeChatbot() {
+        function closeChatbot() {
+        console.log('🔄 Fermeture du chatbot');
+        
+        // ✅ Marquer comme away mais pas offline (juste fermé)
+        if (currentSessionId) {
+            sendHeartbeat('away');
+        }
+        
+        onWidgetClose(); // 🔹 AJOUT DU HEARTBEAT
+        
         localStorage.setItem('chatbot_closed', 'true');
         chatHasBeenClosed = true;
         
@@ -1602,6 +2152,7 @@
             chatContainer.classList.remove('open', 'closing');
             chatContainer.style.display = 'none';
             toggleButton.classList.remove('hidden');
+            handlePopupDisplay();
         }, 300);
     }
     
@@ -1618,6 +2169,9 @@
             chatContainer.classList.add('open');
             chatHasBeenOpened = true;
             localStorage.setItem('chatbot_opened', 'true');
+            chatPopup.classList.remove('show');
+            
+            onWidgetOpen(); // 🔹 AJOUT DU HEARTBEAT
             
             setTimeout(() => {
                 // Essayer de restaurer l'historique
@@ -1649,10 +2203,84 @@
         closeChatbot();
     });
 
-    window.addEventListener('beforeunload', () => {
-        if (sessionTimeout) {
-            clearTimeout(sessionTimeout);
+    function handlePopupDisplay() {
+        if (!chatContainer.classList.contains('open')) {
+            setTimeout(() => {
+                if (!chatContainer.classList.contains('open')) {
+                    chatPopup.classList.add('show');
+                }
+            }, 1000);
+        } else {
+            chatPopup.classList.remove('show');
+        }
+    }
+
+    setTimeout(() => {
+        if (!chatContainer.classList.contains('open')) {
+            handlePopupDisplay();
+        }
+    }, 2000);
+
+    chatPopup.addEventListener('click', () => {
+        toggleButton.click();
+    });
+
+    // === GESTION DES ÉVÉNEMENTS DE FERMETURE DE PAGE ===
+    
+    // ✅ GESTIONNAIRES D'ÉVÉNEMENTS AMÉLIORÉS
+        window.addEventListener('beforeunload', handlePageClose);
+        window.addEventListener('unload', handlePageClose);
+
+        // Gestion de la visibilité de la page (plus fiable)
+        document.addEventListener('visibilitychange', async () => {
+            if (document.hidden) {
+                // Page cachée/minimisée
+                if (isWidgetOpen) {
+                    await sendHeartbeat('away');
+                }
+            } else {
+                // Page visible à nouveau
+                if (isWidgetOpen) {
+                    await sendHeartbeat('online');
+                }
+            }
+        });
+
+    // Gestion de la visibilité de la page
+    document.addEventListener('visibilitychange', () => {
+        if (isWidgetOpen) {
+            if (document.hidden) {
+                sendHeartbeat('away');
+            } else {
+                sendHeartbeat('online');
+            }
         }
     });
+
+    // Gestion de la perte de focus
+    window.addEventListener('blur', () => {
+        if (isWidgetOpen) {
+            sendHeartbeat('away');
+        }
+    });
+
+    // Gestion du retour de focus
+    window.addEventListener('focus', () => {
+        if (isWidgetOpen) {
+            sendHeartbeat('online');
+        }
+    });
+
+// ✅ GESTION DES ONGLETS MULTIPLES
+// Vérifier si d'autres onglets sont actifs
+setInterval(() => {
+    const lastHeartbeat = localStorage.getItem(STORAGE_HEARTBEAT_KEY);
+    if (lastHeartbeat && Date.now() - parseInt(lastHeartbeat) > 20000) {
+        // Aucun autre onglet actif depuis 20 secondes
+        if (currentSessionId && !isWidgetOpen) {
+            markSessionOffline(currentSessionId);
+        }
+    }
+}, 30000); // Vérifier toutes les 30 secondes
 
 })();
