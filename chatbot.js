@@ -14,7 +14,7 @@
     };
     
     // --- AVATAR DU CHATBOT ---
-    const CHATBOT_AVATAR = 'https://comettecosmetics.com/wp-content/uploads/2025/03/Rectangle-5-2-1.png';
+    const CHATBOT_AVATAR = 'https://comettecosmetics.com/wp-content/uploads/2025/03/89f1af3a5983bd70ecc99a2ba7a8bb66-1.png';
     
     // --- QUESTIONS FRÉQUENTES ---
     const PREDEFINED_MESSAGES = [
