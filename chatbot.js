@@ -1063,7 +1063,7 @@
         messagesContainer.appendChild(welcomeMessageDiv);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
         
-        const welcomeText = `<strong>${config.branding.welcomeText}</strong><br>Je suis là pour vous répondre à vos questions !`;
+        const welcomeText = `<strong>${config.branding.welcomeText}</strong><br>Je suis là pour répondre à vos questions !`;
         
         // Sauvegarder le message de bienvenue dans l'historique
         chatHistory.saveMessage({
