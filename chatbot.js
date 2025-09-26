@@ -16,6 +16,10 @@
     // --- AVATAR DU CHATBOT ---
     const CHATBOT_AVATAR = 'https://comettecosmetics.com/wp-content/uploads/2025/08/Photo-chatbot.webp';
     
+    // --- OUVERTURE AUTOMATIQUE ---
+    // Mettre à false pour désactiver l'ouverture automatique du chat au chargement de la page
+    const AUTO_OPEN_CHAT = false;
+    
     // --- QUESTIONS FRÉQUENTES ---
     const PREDEFINED_MESSAGES = [
         "Quels produits conviennent à ma peau sensible ?",
@@ -652,6 +656,10 @@
             enabled: true,
             maxMessages: 100, // Limite du nombre de messages stockés
             persistDuration: 7 * 24 * 60 * 60 * 1000 // 7 jours en millisecondes
+        },
+        // Nouvelle option pour l'ouverture automatique
+        behavior: {
+            autoOpen: AUTO_OPEN_CHAT // Utilise la variable de configuration
         }
     };
 
@@ -665,7 +673,8 @@
             branding: { ...defaultConfig.branding, ...window.GrowthAIChatConfig.branding },
             style: { ...defaultConfig.style, ...window.GrowthAIChatConfig.style },
             security: { ...defaultConfig.security, ...window.GrowthAIChatConfig.security },
-            history: { ...defaultConfig.history, ...window.GrowthAIChatConfig.history }
+            history: { ...defaultConfig.history, ...window.GrowthAIChatConfig.history },
+            behavior: { ...defaultConfig.behavior, ...window.GrowthAIChatConfig.behavior }
         } : defaultConfig;
 
     let currentSessionId = '';
@@ -1022,8 +1031,8 @@
         }
     });
 
-    // Auto-open chatbot seulement si c'est la première visite ET qu'il n'a jamais été fermé
-    if (!chatHasBeenOpened && !chatHasBeenClosed) {
+    // Auto-open chatbot seulement si la configuration l'autorise ET si c'est la première visite ET qu'il n'a jamais été fermé
+    if (config.behavior.autoOpen && !chatHasBeenOpened && !chatHasBeenClosed) {
         setTimeout(() => {
             chatContainer.style.display = 'flex';
             void chatContainer.offsetWidth;
