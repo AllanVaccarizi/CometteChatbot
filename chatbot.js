@@ -1031,8 +1031,9 @@
         }
     });
 
-    // Auto-open chatbot seulement si la configuration l'autorise ET si c'est la première visite ET qu'il n'a jamais été fermé
-    if (config.behavior.autoOpen && !chatHasBeenOpened && !chatHasBeenClosed) {
+    // Auto-open chatbot seulement si la configuration l'autorise explicitement
+    if (config.behavior.autoOpen === true && !chatHasBeenOpened && !chatHasBeenClosed) {
+        console.log('Auto-opening chatbot - config.behavior.autoOpen:', config.behavior.autoOpen);
         setTimeout(() => {
             chatContainer.style.display = 'flex';
             void chatContainer.offsetWidth;
@@ -1052,6 +1053,8 @@
                 }
             }, 800);
         }, 500);
+    } else {
+        console.log('Chatbot auto-open disabled - config.behavior.autoOpen:', config.behavior.autoOpen, 'chatHasBeenOpened:', chatHasBeenOpened, 'chatHasBeenClosed:', chatHasBeenClosed);
     }
 
     function generateUUID() {
