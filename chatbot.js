@@ -1042,7 +1042,7 @@
     });
 
     // Auto-open chatbot seulement si la configuration l'autorise explicitement
-    if (config.behavior.autoOpen === true && !chatHasBeenOpened && !chatHasBeenClosed) {
+    if (AUTO_OPEN_CHAT === true && !chatHasBeenOpened && !chatHasBeenClosed) {
         console.log('Auto-opening chatbot - config.behavior.autoOpen:', config.behavior.autoOpen);
         setTimeout(() => {
             chatContainer.style.display = 'flex';
