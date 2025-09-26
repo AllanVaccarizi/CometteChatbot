@@ -20,6 +20,9 @@
     // Mettre à false pour désactiver l'ouverture automatique du chat au chargement de la page
     const AUTO_OPEN_CHAT = false;
     
+    // Debug: Vérifier la valeur
+    console.log('AUTO_OPEN_CHAT constant:', AUTO_OPEN_CHAT);
+    
     // --- QUESTIONS FRÉQUENTES ---
     const PREDEFINED_MESSAGES = [
         "Quels produits conviennent à ma peau sensible ?",
@@ -676,6 +679,13 @@
             history: { ...defaultConfig.history, ...window.GrowthAIChatConfig.history },
             behavior: { ...defaultConfig.behavior, ...window.GrowthAIChatConfig.behavior }
         } : defaultConfig;
+
+    // Debug logs
+    console.log('Final config.behavior.autoOpen:', config.behavior.autoOpen);
+    console.log('External config exists:', !!window.GrowthAIChatConfig);
+    if (window.GrowthAIChatConfig && window.GrowthAIChatConfig.behavior) {
+        console.log('External behavior config:', window.GrowthAIChatConfig.behavior);
+    }
 
     let currentSessionId = '';
     let sessionTimeout = null;
