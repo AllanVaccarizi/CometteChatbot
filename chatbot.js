@@ -1042,6 +1042,15 @@
     });
 
     // Auto-open chatbot seulement si la configuration l'autorise explicitement
+    console.log('=== DEBUG AUTO-OPEN ===');
+    console.log('AUTO_OPEN_CHAT constant:', AUTO_OPEN_CHAT);
+    console.log('config.behavior.autoOpen:', config.behavior.autoOpen);
+    console.log('chatHasBeenOpened:', chatHasBeenOpened);
+    console.log('chatHasBeenClosed:', chatHasBeenClosed);
+    console.log('localStorage opened:', localStorage.getItem('chatbot_opened'));
+    console.log('localStorage closed:', localStorage.getItem('chatbot_closed'));
+    console.log('Condition will execute?', AUTO_OPEN_CHAT === true && !chatHasBeenOpened && !chatHasBeenClosed);
+
     if (AUTO_OPEN_CHAT === true && !chatHasBeenOpened && !chatHasBeenClosed) {
         console.log('Auto-opening chatbot - config.behavior.autoOpen:', config.behavior.autoOpen);
         setTimeout(() => {
